@@ -1,4 +1,6 @@
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +14,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [role, setRole] = useState("adopter");
+  
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // In a real app, you would validate credentials with an API
+    // For now, we're just redirecting based on the selected role
+    
+    toast({
+      title: "Login successful",
+      description: `Logged in as ${role}`,
+    });
+    
+    // Redirect based on role
+    switch(role) {
+      case "admin":
+        navigate("/admin/dashboard");
+        break;
+      case "shelter":
+        navigate("/shelter/dashboard");
+        break;
+      case "hospital":
+        navigate("/hospital/dashboard");
+        break;
+      case "adopter":
+        navigate("/adopter/home");
+        break;
+      default:
+        navigate("/");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
@@ -39,29 +77,45 @@ export default function Login() {
                   Enter your credentials to access your account
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="name@example.com" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      to="/forgot-password"
-                      className="text-sm text-teal-500 hover:text-teal-600"
-                    >
-                      Forgot password?
-                    </Link>
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="name@example.com" required />
                   </div>
-                  <Input id="password" type="password" />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full bg-teal-500 hover:bg-teal-600">
-                  Login
-                </Button>
-              </CardFooter>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <Link
+                        to="/forgot-password"
+                        className="text-sm text-teal-500 hover:text-teal-600"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <Input id="password" type="password" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Login As</Label>
+                    <Select value={role} onValueChange={setRole}>
+                      <SelectTrigger id="role">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="shelter">Shelter</SelectItem>
+                        <SelectItem value="hospital">Hospital</SelectItem>
+                        <SelectItem value="adopter">Adopter/Fosterer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600">
+                    Login
+                  </Button>
+                </CardFooter>
+              </form>
             </Card>
           </TabsContent>
           <TabsContent value="signup">
@@ -94,6 +148,19 @@ export default function Login() {
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
                   <Input id="confirmPassword" type="password" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signupRole">Role</Label>
+                  <Select defaultValue="adopter">
+                    <SelectTrigger id="signupRole">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="shelter">Shelter</SelectItem>
+                      <SelectItem value="hospital">Hospital</SelectItem>
+                      <SelectItem value="adopter">Adopter/Fosterer</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
               <CardFooter>
