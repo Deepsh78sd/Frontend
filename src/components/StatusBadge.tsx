@@ -1,5 +1,5 @@
 
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 type StatusType = "pending" | "approved" | "rejected" | "scheduled" | "completed" | "available" | "adopted";
 

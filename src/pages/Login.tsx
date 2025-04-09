@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,24 +10,54 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { useToast } from "../components/ui/use-toast";
+
+// Mock login credentials
+const mockUsers = {
+  admin: { email: "admin@example.com", password: "admin123" },
+  shelter: { email: "shelter@example.com", password: "shelter123" },
+  hospital: { email: "hospital@example.com", password: "hospital123" },
+  adopter: { email: "adopter@example.com", password: "adopter123" }
+};
 
 export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [role, setRole] = useState("adopter");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // In a real app, you would validate credentials with an API
-    // For now, we're just redirecting based on the selected role
-    
+    // Simulate API call with a timeout
+    setTimeout(() => {
+      setIsLoading(false);
+      
+      // Check credentials against mock users
+      if (email === mockUsers.admin.email && password === mockUsers.admin.password) {
+        loginSuccess("admin");
+      } else if (email === mockUsers.shelter.email && password === mockUsers.shelter.password) {
+        loginSuccess("shelter");
+      } else if (email === mockUsers.hospital.email && password === mockUsers.hospital.password) {
+        loginSuccess("hospital");
+      } else if (email === mockUsers.adopter.email && password === mockUsers.adopter.password) {
+        loginSuccess("adopter");
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }, 1000);
+  };
+
+  const loginSuccess = (role: string) => {
     toast({
       title: "Login successful",
       description: `Logged in as ${role}`,
@@ -64,113 +94,65 @@ export default function Login() {
           </Link>
         </div>
 
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
-          <TabsContent value="login">
-            <Card>
-              <CardHeader>
-                <CardTitle>Login</CardTitle>
-                <CardDescription>
-                  Enter your credentials to access your account
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleLogin}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="name@example.com" required />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Password</Label>
-                      <Link
-                        to="/forgot-password"
-                        className="text-sm text-teal-500 hover:text-teal-600"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <Input id="password" type="password" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Login As</Label>
-                    <Select value={role} onValueChange={setRole}>
-                      <SelectTrigger id="role">
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="shelter">Shelter</SelectItem>
-                        <SelectItem value="hospital">Hospital</SelectItem>
-                        <SelectItem value="adopter">Adopter/Fosterer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600">
-                    Login
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
-          </TabsContent>
-          <TabsContent value="signup">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sign Up</CardTitle>
-                <CardDescription>
-                  Create a new account to start adopting pets
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First name</Label>
-                    <Input id="firstName" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last name</Label>
-                    <Input id="lastName" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="name@example.com" />
-                </div>
-                <div className="space-y-2">
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardDescription>
+              Enter your credentials to access your account
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleLogin}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="name@example.com" 
+                  required 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" />
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-teal-500 hover:text-teal-600"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input id="confirmPassword" type="password" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signupRole">Role</Label>
-                  <Select defaultValue="adopter">
-                    <SelectTrigger id="signupRole">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="shelter">Shelter</SelectItem>
-                      <SelectItem value="hospital">Hospital</SelectItem>
-                      <SelectItem value="adopter">Adopter/Fosterer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full bg-teal-500 hover:bg-teal-600">
-                  Create Account
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                <Input 
+                  id="password" 
+                  type="password" 
+                  required 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                type="submit" 
+                className="w-full bg-teal-500 hover:bg-teal-600"
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Login"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-teal-500 hover:text-teal-600 font-medium">
+              Sign up
+            </Link>
+          </p>
+        </div>
 
         <p className="text-center mt-6 text-sm text-gray-600">
           By continuing, you agree to our{" "}
@@ -183,6 +165,17 @@ export default function Login() {
           </Link>
           .
         </p>
+
+        {/* Mock credentials information */}
+        <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Login Credentials</h3>
+          <div className="text-xs text-blue-700 space-y-1">
+            <p><strong>Admin:</strong> admin@example.com / admin123</p>
+            <p><strong>Shelter:</strong> shelter@example.com / shelter123</p>
+            <p><strong>Hospital:</strong> hospital@example.com / hospital123</p>
+            <p><strong>Adopter:</strong> adopter@example.com / adopter123</p>
+          </div>
+        </div>
       </div>
     </div>
   );

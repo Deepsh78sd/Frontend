@@ -1,8 +1,8 @@
 
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Users, Building2, HeartPulse, Clipboard, LogOut, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { BarChart3, Users, Building2, HeartPulse, Clipboard, LogOut, Home, User } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -35,6 +35,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <Link to="/profile" className="text-sm font-medium hover:text-teal-600 flex items-center">
+              <User className="w-4 h-4 mr-1" />
+              Profile
+            </Link>
             <Link to="/login" className="text-sm font-medium hover:text-teal-600 flex items-center">
               <LogOut className="w-4 h-4 mr-1" />
               Logout
