@@ -1,7 +1,7 @@
 
-import AdminLayout from "@/components/layouts/AdminLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import AdminLayout from "../../components/layouts/AdminLayout";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 import {
   Table,
   TableBody,
@@ -9,26 +9,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Search, Filter } from "lucide-react";
+} from "../../components/ui/table";
+import { Search, Filter, Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../../components/ui/select";
+import { Link } from "react-router-dom";
+import StatusBadge from "../../components/StatusBadge";
+
+// Pet type enum mapping
+const petTypes = ["Dog", "Cat", "Bird", "Other"];
+
+// Availability status enum mapping
+const availabilityStatuses = ["Available", "Adopted", "Fostered", "Not Available"];
 
 // Mock data for pets
 const pets = [
-  { id: 1, name: "Max", species: "Dog", breed: "Golden Retriever", age: "2 years", shelter: "Happy Paws Shelter", status: "available" },
-  { id: 2, name: "Bella", species: "Cat", breed: "Siamese", age: "1 year", shelter: "Furry Friends Rescue", status: "adopted" },
-  { id: 3, name: "Charlie", species: "Dog", breed: "Beagle", age: "3 years", shelter: "Second Chance Animal Shelter", status: "available" },
-  { id: 4, name: "Luna", species: "Cat", breed: "Persian", age: "4 years", shelter: "Happy Paws Shelter", status: "fostered" },
-  { id: 5, name: "Cooper", species: "Dog", breed: "Labrador Retriever", age: "1 year", shelter: "Forever Home Society", status: "available" },
-  { id: 6, name: "Lucy", species: "Cat", breed: "Maine Coon", age: "2 years", shelter: "Loving Care Animal Rescue", status: "available" },
-  { id: 7, name: "Bailey", species: "Dog", breed: "German Shepherd", age: "5 years", shelter: "Safe Haven Pet Sanctuary", status: "adopted" },
-  { id: 8, name: "Oliver", species: "Cat", breed: "Ragdoll", age: "3 years", shelter: "New Beginnings Animal Shelter", status: "available" },
+  { id: 1, name: "Max", species: petTypes[0], breed: "Golden Retriever", age: "2 years", shelter: "Happy Paws Shelter", availabilityStatus: 0 },
+  { id: 2, name: "Bella", species: petTypes[1], breed: "Siamese", age: "1 year", shelter: "Furry Friends Rescue", availabilityStatus: 1 },
+  { id: 3, name: "Charlie", species: petTypes[0], breed: "Beagle", age: "3 years", shelter: "Second Chance Animal Shelter", availabilityStatus: 0 },
+  { id: 4, name: "Luna", species: petTypes[1], breed: "Persian", age: "4 years", shelter: "Happy Paws Shelter", availabilityStatus: 2 },
+  { id: 5, name: "Cooper", species: petTypes[0], breed: "Labrador Retriever", age: "1 year", shelter: "Forever Home Society", availabilityStatus: 0 },
+  { id: 6, name: "Lucy", species: petTypes[1], breed: "Maine Coon", age: "2 years", shelter: "Loving Care Animal Rescue", availabilityStatus: 0 },
+  { id: 7, name: "Bailey", species: petTypes[0], breed: "German Shepherd", age: "5 years", shelter: "Safe Haven Pet Sanctuary", availabilityStatus: 1 },
+  { id: 8, name: "Oliver", species: petTypes[1], breed: "Ragdoll", age: "3 years", shelter: "New Beginnings Animal Shelter", availabilityStatus: 0 },
 ];
 
 const AdminPets = () => {
@@ -37,6 +45,12 @@ const AdminPets = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Pet Management</h1>
+          <Button className="bg-teal-500 hover:bg-teal-600" asChild>
+            <Link to="/admin/pets/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Add New Pet
+            </Link>
+          </Button>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
@@ -56,9 +70,9 @@ const AdminPets = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="adopted">Adopted</SelectItem>
-                <SelectItem value="fostered">Fostered</SelectItem>
+                <SelectItem value="0">Available</SelectItem>
+                <SelectItem value="1">Adopted</SelectItem>
+                <SelectItem value="2">Fostered</SelectItem>
               </SelectContent>
             </Select>
             
@@ -68,8 +82,10 @@ const AdminPets = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Species</SelectItem>
-                <SelectItem value="dog">Dog</SelectItem>
-                <SelectItem value="cat">Cat</SelectItem>
+                <SelectItem value="0">Dog</SelectItem>
+                <SelectItem value="1">Cat</SelectItem>
+                <SelectItem value="2">Bird</SelectItem>
+                <SelectItem value="3">Other</SelectItem>
               </SelectContent>
             </Select>
             
@@ -105,17 +121,15 @@ const AdminPets = () => {
                     <TableCell>{pet.age}</TableCell>
                     <TableCell>{pet.shelter}</TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                        pet.status === 'available' ? 'bg-green-100 text-green-800' : 
-                        pet.status === 'adopted' ? 'bg-blue-100 text-blue-800' : 
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {pet.status}
-                      </span>
+                      <StatusBadge status={availabilityStatuses[pet.availabilityStatus].toLowerCase() as any} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">View</Button>
-                      <Button variant="ghost" size="sm">Edit</Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={`/admin/pets/${pet.id}`}>View</Link>
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={`/admin/pets/${pet.id}/edit`}>Edit</Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

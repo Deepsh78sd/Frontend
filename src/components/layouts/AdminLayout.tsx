@@ -1,8 +1,17 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Users, Building2, HeartPulse, Clipboard, LogOut, Home, User } from "lucide-react";
+import { BarChart3, Users, Building2, HeartPulse, Clipboard, LogOut, Home, User, Menu, X } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -10,6 +19,7 @@ interface AdminLayoutProps {
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const navItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <BarChart3 className="w-5 h-5" /> },
@@ -25,6 +35,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
           <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="md:hidden mr-2"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
             <Link to="/admin/dashboard" className="flex items-center text-teal-500 font-medium">
               <svg viewBox="0 0 24 24" className="w-6 h-6 mr-2" fill="currentColor">
                 <path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z M14.5,9c0,0.83-0.67,1.5-1.5,1.5s-1.5-0.67-1.5-1.5s0.67-1.5,1.5-1.5S14.5,8.17,14.5,9z M9,9c0,0.83-0.67,1.5-1.5,1.5S6,9.83,6,9s0.67-1.5,1.5-1.5S9,8.17,9,9z M12,16.5c-2.03,0-3.8-1.11-4.75-2.75c0.7-0.87,1.77-1.75,2.75-1.75c0.39,0,0.74,0.24,1,0.5c0.26-0.26,0.61-0.5,1-0.5c0.98,0,2.05,0.88,2.75,1.75C13.8,15.39,12.03,16.5,12,16.5z" />
@@ -35,20 +53,48 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link to="/profile" className="text-sm font-medium hover:text-teal-600 flex items-center">
-              <User className="w-4 h-4 mr-1" />
-              Profile
-            </Link>
-            <Link to="/login" className="text-sm font-medium hover:text-teal-600 flex items-center">
-              <LogOut className="w-4 h-4 mr-1" />
-              Logout
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  <span className="hidden md:inline">Admin User</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer">Profile Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/login" className="cursor-pointer text-red-500 flex items-center gap-2">
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
 
       <div className="flex flex-1">
-        <nav className="w-64 bg-white border-r h-[calc(100vh-64px)] sticky top-16">
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        
+        {/* Sidebar */}
+        <nav 
+          className={cn(
+            "w-64 bg-white border-r h-[calc(100vh-64px)] sticky top-16 z-30",
+            sidebarOpen ? "fixed left-0 top-16 bottom-0" : "hidden md:block"
+          )}
+        >
           <div className="p-4">
             <ul className="space-y-1">
               {navItems.map((item) => (
@@ -57,10 +103,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     to={item.path}
                     className={cn(
                       "flex items-center px-4 py-2 text-sm font-medium rounded-md",
-                      location.pathname === item.path
+                      location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
                         ? "bg-teal-50 text-teal-700"
                         : "text-gray-700 hover:bg-gray-100"
                     )}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     {item.icon}
                     <span className="ml-3">{item.name}</span>

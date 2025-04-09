@@ -19,6 +19,9 @@ import AdminUsers from "./pages/admin/Users";
 import AdminShelters from "./pages/admin/Shelters";
 import AdminHospitals from "./pages/admin/Hospitals";
 import AdminPets from "./pages/admin/Pets";
+import AdminPetView from "./pages/admin/PetView";
+import AdminPetEdit from "./pages/admin/PetEdit";
+import AdminPetCreate from "./pages/admin/PetCreate";
 
 // Shelter Pages
 import ShelterDashboard from "./pages/shelter/Dashboard";
@@ -26,12 +29,18 @@ import ShelterApplications from "./pages/shelter/Applications";
 import ShelterPets from "./pages/shelter/Pets";
 import ShelterHistory from "./pages/shelter/History";
 import ShelterPetCare from "./pages/shelter/PetCare";
+import ShelterPetView from "./pages/shelter/PetView";
+import ShelterPetEdit from "./pages/shelter/PetEdit";
+import ShelterPetCreate from "./pages/shelter/PetCreate";
 
 // Hospital Pages
 import HospitalDashboard from "./pages/hospital/Dashboard";
 import HospitalPets from "./pages/hospital/Pets";
 import HospitalPetCare from "./pages/hospital/PetCare";
 import HospitalAppointments from "./pages/hospital/Appointments";
+import HospitalAppointmentView from "./pages/hospital/AppointmentView";
+import HospitalAppointmentEdit from "./pages/hospital/AppointmentEdit";
+import HospitalAppointmentCreate from "./pages/hospital/AppointmentCreate";
 
 // Adopter Pages
 import AdopterHome from "./pages/adopter/Home";
@@ -39,6 +48,10 @@ import AdopterPets from "./pages/adopter/Pets";
 import AdopterAbout from "./pages/adopter/About";
 import AdopterPetCare from "./pages/adopter/PetCare";
 import AdopterApplications from "./pages/adopter/Applications";
+import AdopterPetView from "./pages/adopter/PetView";
+import AdopterAppointments from "./pages/adopter/Appointments";
+import AdopterAppointmentView from "./pages/adopter/AppointmentView";
+import AdopterAppointmentCreate from "./pages/adopter/AppointmentCreate";
 
 const queryClient = new QueryClient();
 
@@ -61,11 +74,17 @@ const App = () => (
           <Route path="/admin/shelters" element={<AdminShelters />} />
           <Route path="/admin/hospitals" element={<AdminHospitals />} />
           <Route path="/admin/pets" element={<AdminPets />} />
+          <Route path="/admin/pets/create" element={<AdminPetCreate />} />
+          <Route path="/admin/pets/:id" element={<AdminPetView />} />
+          <Route path="/admin/pets/:id/edit" element={<AdminPetEdit />} />
           
           {/* Shelter Routes */}
           <Route path="/shelter/dashboard" element={<ShelterDashboard />} />
           <Route path="/shelter/applications" element={<ShelterApplications />} />
           <Route path="/shelter/pets" element={<ShelterPets />} />
+          <Route path="/shelter/pets/create" element={<ShelterPetCreate />} />
+          <Route path="/shelter/pets/:id" element={<ShelterPetView />} />
+          <Route path="/shelter/pets/:id/edit" element={<ShelterPetEdit />} />
           <Route path="/shelter/history" element={<ShelterHistory />} />
           <Route path="/shelter/petcare" element={<ShelterPetCare />} />
           
@@ -74,13 +93,20 @@ const App = () => (
           <Route path="/hospital/pets" element={<HospitalPets />} />
           <Route path="/hospital/petcare" element={<HospitalPetCare />} />
           <Route path="/hospital/appointments" element={<HospitalAppointments />} />
+          <Route path="/hospital/appointments/create" element={<HospitalAppointmentCreate />} />
+          <Route path="/hospital/appointments/:id" element={<HospitalAppointmentView />} />
+          <Route path="/hospital/appointments/:id/edit" element={<HospitalAppointmentEdit />} />
           
           {/* Adopter Routes */}
           <Route path="/adopter/home" element={<AdopterHome />} />
           <Route path="/adopter/pets" element={<AdopterPets />} />
+          <Route path="/adopter/pets/:id" element={<AdopterPetView />} />
           <Route path="/adopter/about" element={<AdopterAbout />} />
           <Route path="/adopter/petcare" element={<AdopterPetCare />} />
           <Route path="/adopter/applications" element={<AdopterApplications />} />
+          <Route path="/adopter/appointments" element={<AdopterAppointments />} />
+          <Route path="/adopter/appointments/create" element={<AdopterAppointmentCreate />} />
+          <Route path="/adopter/appointments/:id" element={<AdopterAppointmentView />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
