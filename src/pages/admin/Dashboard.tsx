@@ -1,11 +1,27 @@
 
 import AdminLayout from "@/components/layouts/AdminLayout";
 import StatCard from "@/components/ui/stat-card";
-import ApplicationTable from "@/components/ui/application-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, Heart, Building2, HeartPulse, ClipboardList } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+// Define the type for applications
+type Application = {
+  id: number;
+  petName: string;
+  applicantName: string;
+  date: string;
+  status: "pending" | "approved" | "rejected";
+}
 
 // Mock data for charts
 const adoptionData = [
@@ -18,12 +34,54 @@ const adoptionData = [
 ];
 
 // Mock data for applications
-const recentApplications = [
+const recentApplications: Application[] = [
   { id: 1, petName: "Max", applicantName: "John Doe", date: "2023-09-15", status: "pending" },
   { id: 2, petName: "Bella", applicantName: "Jane Smith", date: "2023-09-14", status: "approved" },
   { id: 3, petName: "Charlie", applicantName: "Mike Johnson", date: "2023-09-13", status: "rejected" },
   { id: 4, petName: "Luna", applicantName: "Sarah Williams", date: "2023-09-12", status: "pending" },
-] as const;
+];
+
+const ApplicationTable = ({ applications }: { applications: Application[] }) => {
+  return (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Pet Name</TableHead>
+            <TableHead>Applicant</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {applications.map((application) => (
+            <TableRow key={application.id}>
+              <TableCell>#{application.id}</TableCell>
+              <TableCell>{application.petName}</TableCell>
+              <TableCell>{application.applicantName}</TableCell>
+              <TableCell>{application.date}</TableCell>
+              <TableCell>
+                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+                  application.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                  application.status === 'rejected' ? 'bg-red-100 text-red-800' : 
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {application.status}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <Button variant="ghost" size="sm">View</Button>
+                <Button variant="ghost" size="sm">Edit</Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
 
 const AdminDashboard = () => {
   return (
