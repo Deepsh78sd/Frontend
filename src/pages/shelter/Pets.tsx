@@ -40,6 +40,9 @@ import {
 import StatusBadge from "@/components/StatusBadge";
 import { useToast } from "@/components/ui/use-toast";
 
+// Define the allowed status types to match StatusBadge component
+type PetStatus = "available" | "pending" | "adopted";
+
 // Mock data for pets
 const petsList = [
   {
@@ -49,7 +52,7 @@ const petsList = [
     breed: "Golden Retriever",
     age: "2 years",
     gender: "Male",
-    status: "available",
+    status: "available" as PetStatus,
     image: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z29sZGVuJTIwcmV0cmlldmVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -59,7 +62,7 @@ const petsList = [
     breed: "Siamese",
     age: "1 year",
     gender: "Female",
-    status: "pending",
+    status: "pending" as PetStatus,
     image: "https://images.unsplash.com/photo-1560114928-40f1f1eb26a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2lhbWVzZSUyMGNhdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -69,7 +72,7 @@ const petsList = [
     breed: "Labrador",
     age: "3 years",
     gender: "Male",
-    status: "adopted",
+    status: "adopted" as PetStatus,
     image: "https://images.unsplash.com/photo-1579557102725-f864cab7aabb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bGFicmFkb3IlMjByZXRyaWV2ZXJ8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -79,7 +82,7 @@ const petsList = [
     breed: "Persian",
     age: "2 years",
     gender: "Male",
-    status: "available",
+    status: "available" as PetStatus,
     image: "https://images.unsplash.com/photo-1577023311546-cdc07a8454d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc2lhbiUyMGNhdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -89,7 +92,7 @@ const petsList = [
     breed: "German Shepherd",
     age: "4 years",
     gender: "Male",
-    status: "available",
+    status: "available" as PetStatus,
     image: "https://images.unsplash.com/photo-1589941013196-bc91be2e31b6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z2VybWFuJTIwc2hlcGhlcmR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -99,7 +102,7 @@ const petsList = [
     breed: "Maine Coon",
     age: "1 year",
     gender: "Female",
-    status: "available",
+    status: "available" as PetStatus,
     image: "https://images.unsplash.com/photo-1615796153287-53ca0735931a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWFpbmUlMjBjb29ufGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -109,7 +112,7 @@ const petsList = [
     breed: "Beagle",
     age: "5 years",
     gender: "Female",
-    status: "pending",
+    status: "pending" as PetStatus,
     image: "https://images.unsplash.com/photo-1544715660-c0891b2f7ba7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmVhZ2xlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
   },
   {
@@ -119,16 +122,19 @@ const petsList = [
     breed: "Ragdoll",
     age: "3 years",
     gender: "Male",
-    status: "adopted",
+    status: "adopted" as PetStatus,
     image: "https://images.unsplash.com/photo-1592308115958-3112e8bec286?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cmFnZG9sbCUyMGNhdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
   },
 ];
 
+// Define type for pet data
+type Pet = typeof petsList[0];
+
 const ShelterPets = () => {
   const { toast } = useToast();
   const [view, setView] = useState("grid");
-  const [filter, setFilter] = useState("all");
-  const [pets, setPets] = useState(petsList);
+  const [filter, setFilter] = useState<"all" | PetStatus>("all");
+  const [pets, setPets] = useState<Pet[]>(petsList);
 
   // Filter pets based on status
   const filteredPets = filter === "all" 
@@ -249,7 +255,7 @@ const ShelterPets = () => {
           </div>
           
           <div className="flex gap-3">
-            <Select value={filter} onValueChange={setFilter}>
+            <Select value={filter} onValueChange={(value) => setFilter(value as typeof filter)}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
