@@ -12,6 +12,18 @@ import {
 } from "@/components/ui/table";
 import { Calendar, Eye, Pencil, Trash } from "lucide-react";
 
+// Define proper types for appointments
+type AppointmentStatus = "scheduled" | "completed" | "canceled";
+
+interface Appointment {
+  id: number;
+  petName: string;
+  date: string;
+  time: string;
+  hospital: string;
+  status: AppointmentStatus;
+}
+
 const Appointments = () => {
   return (
     <PageLayout>
@@ -89,30 +101,30 @@ const Appointments = () => {
   );
 };
 
-const appointments = [
+const appointments: Appointment[] = [
   {
     id: 1,
     petName: "Max",
-    date: "Invalid Date",
-    time: "Invalid Date",
+    date: "April 15, 2025",
+    time: "10:00 AM",
     hospital: "Paws & Claws Vet Clinic",
-    status: "scheduled" as const,
+    status: "scheduled",
   },
   {
     id: 2,
     petName: "Bella",
-    date: "Invalid Date",
-    time: "Invalid Date",
+    date: "April 20, 2025",
+    time: "2:30 PM",
     hospital: "Pet Care Center",
-    status: "scheduled" as const,
+    status: "scheduled",
   },
   {
     id: 3,
     petName: "Cooper",
-    date: "Invalid Date",
-    time: "Invalid Date",
+    date: "April 5, 2025",
+    time: "11:15 AM",
     hospital: "Animal Wellness Hospital",
-    status: "completed" as const,
+    status: "completed",
   },
 ];
 

@@ -22,15 +22,29 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 
+// Define the allowed status types
+type AppointmentStatus = "scheduled" | "completed" | "canceled";
+
+// Define the appointment type
+interface Appointment {
+  id: number;
+  petName: string;
+  date: Date;
+  time: string;
+  hospital: string;
+  status: AppointmentStatus;
+  petId: string;
+}
+
 // Mock data for appointments
-const initialAppointments = [
+const initialAppointments: Appointment[] = [
   {
     id: 1,
     petName: "Max",
     date: new Date("2025-04-15"),
     time: "10:00 AM",
     hospital: "Pet Care Hospital",
-    status: "scheduled" as const,
+    status: "scheduled",
     petId: "pet-123",
   },
   {
@@ -39,7 +53,7 @@ const initialAppointments = [
     date: new Date("2025-04-20"),
     time: "2:30 PM",
     hospital: "Animal Medical Center",
-    status: "scheduled" as const,
+    status: "scheduled",
     petId: "pet-456",
   },
   {
@@ -48,15 +62,15 @@ const initialAppointments = [
     date: new Date("2025-04-05"),
     time: "11:15 AM",
     hospital: "Paws & Claws Veterinary Clinic",
-    status: "completed" as const,
+    status: "completed",
     petId: "pet-789",
   },
 ];
 
 const AdopterAppointments = () => {
   const { toast } = useToast();
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [filter, setFilter] = useState("all");
+  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  const [filter, setFilter] = useState<"all" | AppointmentStatus>("all");
 
   const filteredAppointments = filter === "all"
     ? appointments
@@ -66,7 +80,7 @@ const AdopterAppointments = () => {
     setAppointments(prev => 
       prev.map(appointment => 
         appointment.id === id 
-          ? { ...appointment, status: "canceled" as const } 
+          ? { ...appointment, status: "canceled" as AppointmentStatus } 
           : appointment
       )
     );
@@ -91,7 +105,7 @@ const AdopterAppointments = () => {
         </div>
 
         <div className="flex justify-end">
-          <Select value={filter} onValueChange={setFilter}>
+          <Select value={filter} onValueChange={(value) => setFilter(value as "all" | AppointmentStatus)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
