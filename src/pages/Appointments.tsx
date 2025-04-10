@@ -13,6 +13,14 @@ import {
 } from "../components/ui/table";
 import { Calendar, Eye, Pencil, Trash, PlusCircle } from "lucide-react";
 import { useToast } from "../components/ui/use-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);

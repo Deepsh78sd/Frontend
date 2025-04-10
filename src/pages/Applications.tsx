@@ -11,7 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
-import { Eye, Pencil, Trash } from "lucide-react";
+import { Eye, Pencil, Trash, Heart, FolderPlus, File } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 const Applications = () => {
   const [applications, setApplications] = useState([
@@ -127,6 +134,6 @@ const Applications = () => {
   );
 };
 
-import { Heart, FolderPlus, File, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "lucide-react";
+import { Heart, FolderPlus, File } from "lucide-react";
 
 export default Applications;

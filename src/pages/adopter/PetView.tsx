@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PageLayout from "../../components/PageLayout";
@@ -10,6 +11,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "../../components/ui/card";
+import { Label } from "../../components/ui/label";
 import { Separator } from "../../components/ui/separator";
 import { Heart, ArrowLeft, Calendar } from "lucide-react";
 import { useToast } from "../../components/ui/use-toast";
