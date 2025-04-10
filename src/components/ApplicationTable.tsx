@@ -14,22 +14,38 @@ import {
 import { Eye, Check, X } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 
-interface Application {
+// Define the types for application
+type ApplicationType = "adoption" | "fostering";
+type ApplicationStatus = "pending" | "processing" | "approved" | "rejected";
+
+// Create interfaces for each application type to enforce proper typing
+interface BaseApplication {
   id: string;
   petName: string;
   petId: string;
   applicantName: string;
   applicantId: string;
   date: Date;
-  type: "adoption" | "fostering";
-  status: "pending" | "approved" | "rejected" | "processing";
   approvals: {
     admin: boolean;
     hospital: boolean;
     shelter: boolean;
   };
-  fosterDays?: number;
 }
+
+interface AdoptionApplication extends BaseApplication {
+  type: "adoption";
+  status: ApplicationStatus;
+  fosterDays?: never;
+}
+
+interface FosteringApplication extends BaseApplication {
+  type: "fostering";
+  status: ApplicationStatus;
+  fosterDays: number;
+}
+
+type Application = AdoptionApplication | FosteringApplication;
 
 interface ApplicationTableProps {
   applications: Application[];
@@ -81,8 +97,8 @@ const ApplicationTable = ({ applications, userRole, onApprove, onReject }: Appli
           return {
             ...app,
             approvals: newApprovals,
-            status: allApproved ? "approved" : "processing"
-          };
+            status: allApproved ? "approved" as const : "processing" as const
+          } as Application;
         }
         return app;
       })
@@ -103,7 +119,17 @@ const ApplicationTable = ({ applications, userRole, onApprove, onReject }: Appli
     setLocalApplications(prev => 
       prev.map(app => {
         if (app.id === id) {
-          return { ...app, status: "rejected" };
+          const newApprovals = { ...app.approvals };
+          
+          if (userRole === 'admin') newApprovals.admin = false;
+          if (userRole === 'hospital') newApprovals.hospital = false;
+          if (userRole === 'shelter') newApprovals.shelter = false;
+          
+          return { 
+            ...app, 
+            status: "rejected" as const,
+            approvals: newApprovals
+          } as Application;
         }
         return app;
       })

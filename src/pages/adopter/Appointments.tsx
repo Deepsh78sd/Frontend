@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import PageLayout from "../../components/PageLayout";
 import StatusBadge from "../../components/StatusBadge";
@@ -92,7 +91,7 @@ const AdopterAppointments = () => {
   };
 
   return (
-    <PageLayout>
+    <PageLayout userRole="adopter" userName="John Doe">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">My Appointments</h1>

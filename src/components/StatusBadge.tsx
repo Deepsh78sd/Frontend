@@ -29,7 +29,7 @@ const StatusBadge = ({ status }: StatusBadgeProps) => {
       case "canceled":
         return "bg-gray-100 text-gray-500";
       case "processing":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-blue-100 text-blue-700";
       default:
         return "bg-gray-100 text-gray-800";
     }

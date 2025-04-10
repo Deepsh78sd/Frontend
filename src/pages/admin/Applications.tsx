@@ -14,8 +14,41 @@ import {
 import { Search, Filter } from "lucide-react";
 import { useToast } from "../../components/ui/use-toast";
 
+// Define the types for application
+type ApplicationType = "adoption" | "fostering";
+type ApplicationStatus = "pending" | "processing" | "approved" | "rejected";
+
+// Create interfaces for each application type to enforce proper typing
+interface BaseApplication {
+  id: string;
+  petName: string;
+  petId: string;
+  applicantName: string;
+  applicantId: string;
+  date: Date;
+  approvals: {
+    admin: boolean;
+    hospital: boolean;
+    shelter: boolean;
+  };
+}
+
+interface AdoptionApplication extends BaseApplication {
+  type: "adoption";
+  status: ApplicationStatus;
+  fosterDays?: never;
+}
+
+interface FosteringApplication extends BaseApplication {
+  type: "fostering";
+  status: ApplicationStatus;
+  fosterDays: number;
+}
+
+type Application = AdoptionApplication | FosteringApplication;
+
 // Sample applications data
-const initialApplications = [
+const initialApplications: Application[] = [
   {
     id: "app-123456",
     petName: "Max",
@@ -23,8 +56,8 @@ const initialApplications = [
     applicantName: "John Doe",
     applicantId: "user-001",
     date: new Date("2025-03-15"),
-    type: "adoption" as const,
-    status: "pending" as const,
+    type: "adoption",
+    status: "pending",
     approvals: {
       admin: false,
       hospital: false,
@@ -38,8 +71,8 @@ const initialApplications = [
     applicantName: "Jane Smith",
     applicantId: "user-002",
     date: new Date("2025-03-14"),
-    type: "fostering" as const,
-    status: "processing" as const,
+    type: "fostering",
+    status: "processing",
     fosterDays: 30,
     approvals: {
       admin: false,
@@ -54,8 +87,8 @@ const initialApplications = [
     applicantName: "Mike Johnson",
     applicantId: "user-003",
     date: new Date("2025-03-13"),
-    type: "adoption" as const,
-    status: "approved" as const,
+    type: "adoption",
+    status: "approved",
     approvals: {
       admin: true,
       hospital: true,
@@ -69,8 +102,8 @@ const initialApplications = [
     applicantName: "Sarah Williams",
     applicantId: "user-004",
     date: new Date("2025-03-12"),
-    type: "fostering" as const,
-    status: "rejected" as const,
+    type: "fostering",
+    status: "rejected",
     fosterDays: 14,
     approvals: {
       admin: false,
@@ -82,10 +115,10 @@ const initialApplications = [
 
 const AdminApplications = () => {
   const { toast } = useToast();
-  const [applications, setApplications] = useState(initialApplications);
+  const [applications, setApplications] = useState<Application[]>(initialApplications);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | ApplicationType>("all");
   
   // Filter applications based on search and filters
   const filteredApplications = applications.filter(app => {
@@ -112,8 +145,8 @@ const AdminApplications = () => {
           return {
             ...app,
             approvals: newApprovals,
-            status: allApproved ? "approved" : "processing"
-          };
+            status: allApproved ? "approved" as const : "processing" as const
+          } as Application;
         }
         return app;
       })
@@ -131,9 +164,9 @@ const AdminApplications = () => {
         if (app.id === id) {
           return { 
             ...app, 
-            status: "rejected",
+            status: "rejected" as const,
             approvals: { ...app.approvals, admin: false }
-          };
+          } as Application;
         }
         return app;
       })
@@ -165,7 +198,7 @@ const AdminApplications = () => {
           </div>
           
           <div className="flex gap-3">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as "all" | ApplicationStatus)}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -178,7 +211,7 @@ const AdminApplications = () => {
               </SelectContent>
             </Select>
             
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as "all" | ApplicationType)}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>

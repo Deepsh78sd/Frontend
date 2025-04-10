@@ -1,14 +1,8 @@
-
-import PageLayout from "@/components/PageLayout";
-import StatusBadge from "@/components/StatusBadge";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import PageLayout from "../components/PageLayout";
+import { Button } from "../components/ui/button";
+import StatusBadge from "../components/StatusBadge";
 import {
   Table,
   TableBody,
@@ -16,12 +10,36 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Eye, Pencil, File, Trash } from "lucide-react";
+} from "../components/ui/table";
+import { Eye, Pencil, Trash } from "lucide-react";
 
 const Applications = () => {
+  const [applications, setApplications] = useState([
+    {
+      id: "1",
+      pet: "Max",
+      shelter: "Happy Paws Shelter",
+      dateApplied: "2023-09-15",
+      status: "pending" as const,
+    },
+    {
+      id: "2",
+      pet: "Bella",
+      shelter: "FurEver Home",
+      dateApplied: "2023-09-10",
+      status: "approved" as const,
+    },
+    {
+      id: "3",
+      pet: "Charlie",
+      shelter: "Second Chance Rescue",
+      dateApplied: "2023-08-25",
+      status: "rejected" as const,
+    },
+  ]);
+
   return (
-    <PageLayout>
+    <PageLayout userRole="adopter" userName="John Doe">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h1 className="text-3xl font-bold">My Applications</h1>
@@ -109,30 +127,6 @@ const Applications = () => {
   );
 };
 
-import { Heart, FolderPlus } from "lucide-react";
-
-const applications = [
-  {
-    id: "1",
-    pet: "Max",
-    shelter: "Happy Paws Shelter",
-    dateApplied: "2023-09-15",
-    status: "pending" as const,
-  },
-  {
-    id: "2",
-    pet: "Bella",
-    shelter: "FurEver Home",
-    dateApplied: "2023-09-10",
-    status: "approved" as const,
-  },
-  {
-    id: "3",
-    pet: "Charlie",
-    shelter: "Second Chance Rescue",
-    dateApplied: "2023-08-25",
-    status: "rejected" as const,
-  },
-];
+import { Heart, FolderPlus, File, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "lucide-react";
 
 export default Applications;
