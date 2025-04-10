@@ -18,7 +18,7 @@ import {
   CardTitle 
 } from "../../components/ui/card";
 import { Search, Filter, Heart, Eye } from "lucide-react";
-import StatusBadge from "../../components/StatusBadge";
+import StatusBadge, { StatusType } from "../../components/StatusBadge";
 import { withPageLayout } from "../../utils/layoutHelper";
 import { useToast } from "../../components/ui/use-toast";
 
@@ -26,7 +26,7 @@ const AdopterPetsPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<"all" | StatusType>("all");
 
   // Mock pet data
   const [pets, setPets] = useState([
@@ -36,7 +36,7 @@ const AdopterPetsPage = () => {
       type: "Dog",
       breed: "Golden Retriever",
       age: "2 years",
-      status: "available",
+      status: "available" as StatusType,
       image: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
       description: "Max is a friendly and energetic Golden Retriever looking for an active family."
     },
@@ -46,7 +46,7 @@ const AdopterPetsPage = () => {
       type: "Cat",
       breed: "Maine Coon",
       age: "3 years",
-      status: "pending",
+      status: "pending" as StatusType,
       image: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
       description: "Bella is a gentle Maine Coon who loves to cuddle and play with toys."
     },
@@ -56,7 +56,7 @@ const AdopterPetsPage = () => {
       type: "Dog",
       breed: "Beagle",
       age: "1 year",
-      status: "available",
+      status: "available" as StatusType,
       image: "https://images.unsplash.com/photo-1585584114963-503344a119b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
       description: "Charlie is a playful Beagle puppy who needs a home with a yard to run around in."
     },
@@ -66,7 +66,7 @@ const AdopterPetsPage = () => {
       type: "Cat",
       breed: "Siamese",
       age: "4 years",
-      status: "adopted",
+      status: "adopted" as StatusType,
       image: "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
       description: "Luna is a talkative Siamese cat who enjoys sitting on laps and being the center of attention."
     },

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
@@ -13,20 +12,20 @@ import {
   TableRow 
 } from "../../components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import StatusBadge from "../../components/StatusBadge";
+import StatusBadge, { StatusType } from "../../components/StatusBadge";
 import { withPageLayout } from "../../utils/layoutHelper";
 
 const ShelterPets = () => {
   const [pets, setPets] = useState([
-    { id: 1, name: "Max", type: "Dog", breed: "Golden Retriever", age: "2 years", status: "available" },
-    { id: 2, name: "Bella", type: "Cat", breed: "Maine Coon", age: "3 years", status: "pending" },
-    { id: 3, name: "Charlie", type: "Dog", breed: "Beagle", age: "1 year", status: "adopted" },
-    { id: 4, name: "Luna", type: "Cat", breed: "Siamese", age: "4 years", status: "available" },
-    { id: 5, name: "Cooper", type: "Dog", breed: "Labrador", age: "5 years", status: "available" },
+    { id: 1, name: "Max", type: "Dog", breed: "Golden Retriever", age: "2 years", status: "available" as StatusType },
+    { id: 2, name: "Bella", type: "Cat", breed: "Maine Coon", age: "3 years", status: "pending" as StatusType },
+    { id: 3, name: "Charlie", type: "Dog", breed: "Beagle", age: "1 year", status: "adopted" as StatusType },
+    { id: 4, name: "Luna", type: "Cat", breed: "Siamese", age: "4 years", status: "available" as StatusType },
+    { id: 5, name: "Cooper", type: "Dog", breed: "Labrador", age: "5 years", status: "available" as StatusType },
   ]);
   
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | StatusType>("all");
 
   const handleView = (id: number) => {
     window.location.href = `/shelter/pets/${id}`;

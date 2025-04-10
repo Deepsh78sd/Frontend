@@ -1,7 +1,7 @@
 
 import { cn } from "../lib/utils";
 
-type StatusType = "pending" | "approved" | "rejected" | "scheduled" | "completed" | "available" | "adopted" | "fostered" | "canceled" | "processing";
+export type StatusType = "pending" | "approved" | "rejected" | "scheduled" | "completed" | "available" | "adopted" | "fostered" | "canceled" | "processing";
 
 interface StatusBadgeProps {
   status: StatusType;
