@@ -1,165 +1,37 @@
-
-import AdminLayout from "@/components/layouts/AdminLayout";
-import StatCard from "@/components/ui/stat-card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, Heart, Building2, HeartPulse, ClipboardList } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-// Define the type for applications
-type Application = {
-  id: number;
-  petName: string;
-  applicantName: string;
-  date: string;
-  status: "pending" | "approved" | "rejected";
-}
-
-// Mock data for charts
-const adoptionData = [
-  { name: 'Jan', adoptions: 25, fosters: 15 },
-  { name: 'Feb', adoptions: 32, fosters: 18 },
-  { name: 'Mar', adoptions: 28, fosters: 20 },
-  { name: 'Apr', adoptions: 35, fosters: 22 },
-  { name: 'May', adoptions: 30, fosters: 18 },
-  { name: 'Jun', adoptions: 34, fosters: 25 },
-];
-
-// Mock data for applications
-const recentApplications: Application[] = [
-  { id: 1, petName: "Max", applicantName: "John Doe", date: "2023-09-15", status: "pending" },
-  { id: 2, petName: "Bella", applicantName: "Jane Smith", date: "2023-09-14", status: "approved" },
-  { id: 3, petName: "Charlie", applicantName: "Mike Johnson", date: "2023-09-13", status: "rejected" },
-  { id: 4, petName: "Luna", applicantName: "Sarah Williams", date: "2023-09-12", status: "pending" },
-];
-
-const ApplicationTable = ({ applications }: { applications: Application[] }) => {
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Pet Name</TableHead>
-            <TableHead>Applicant</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {applications.map((application) => (
-            <TableRow key={application.id}>
-              <TableCell>#{application.id}</TableCell>
-              <TableCell>{application.petName}</TableCell>
-              <TableCell>{application.applicantName}</TableCell>
-              <TableCell>{application.date}</TableCell>
-              <TableCell>
-                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                  application.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                  application.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {application.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm">View</Button>
-                <Button variant="ghost" size="sm">Edit</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-};
+import { useState } from "react";
+import PageLayout from "../../components/PageLayout";
+import { Button } from "../../components/ui/button";
 
 const AdminDashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    totalUsers: 150,
+    activeShelters: 25,
+    pendingApplications: 12,
+  });
+
   return (
-    <AdminLayout>
+    <PageLayout userRole="admin" userName="Admin User">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <Button variant="outline">View Reports</Button>
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard 
-            title="Total Adoptions" 
-            value="245" 
-            icon={<Heart className="h-6 w-6" />} 
-            note="+12% from last month"
-          />
-          <StatCard 
-            title="Active Users" 
-            value="1,234" 
-            icon={<Users className="h-6 w-6" />} 
-            note="+5% from last month"
-          />
-          <StatCard 
-            title="Shelters" 
-            value="35" 
-            icon={<Building2 className="h-6 w-6" />} 
-            note="+2 this month"
-          />
-          <StatCard 
-            title="Pending Applications" 
-            value="28" 
-            icon={<ClipboardList className="h-6 w-6" />} 
-            note="5 need urgent review"
-          />
-        </div>
-
-        {/* Adoption & Fostering Statistics */}
-        <div className="bg-white p-6 rounded-lg border">
-          <h2 className="text-lg font-semibold mb-2">Adoption & Fostering Statistics</h2>
-          <p className="text-sm text-gray-500 mb-4">Monthly adoption and fostering trends</p>
-          
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={adoptionData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="adoptions" name="Adoptions" fill="#14b8a6" />
-                <Bar dataKey="fosters" name="Fosters" fill="#6366f1" />
-              </BarChart>
-            </ResponsiveContainer>
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white shadow-md rounded-md p-4">
+            <h2 className="text-lg font-semibold">Total Users</h2>
+            <p className="text-2xl">{dashboardData.totalUsers}</p>
+          </div>
+          <div className="bg-white shadow-md rounded-md p-4">
+            <h2 className="text-lg font-semibold">Active Shelters</h2>
+            <p className="text-2xl">{dashboardData.activeShelters}</p>
+          </div>
+          <div className="bg-white shadow-md rounded-md p-4">
+            <h2 className="text-lg font-semibold">Pending Applications</h2>
+            <p className="text-2xl">{dashboardData.pendingApplications}</p>
           </div>
         </div>
-
-        {/* Application Management */}
-        <div className="bg-white p-6 rounded-lg border">
-          <Tabs defaultValue="applications">
-            <TabsList>
-              <TabsTrigger value="applications">Recent Applications</TabsTrigger>
-              <TabsTrigger value="users">User Management</TabsTrigger>
-              <TabsTrigger value="pets">Recent Pets</TabsTrigger>
-            </TabsList>
-            <TabsContent value="applications">
-              <ApplicationTable applications={recentApplications} />
-            </TabsContent>
-            <TabsContent value="users">
-              <p className="py-4 text-muted-foreground">User management content will go here.</p>
-            </TabsContent>
-            <TabsContent value="pets">
-              <p className="py-4 text-muted-foreground">Recent pets content will go here.</p>
-            </TabsContent>
-          </Tabs>
+        <div>
+          <Button>Generate Report</Button>
         </div>
       </div>
-    </AdminLayout>
+    </PageLayout>
   );
 };
 

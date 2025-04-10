@@ -1,9 +1,9 @@
-
-import ShelterLayout from "@/components/layouts/ShelterLayout";
-import StatCard from "@/components/ui/stat-card";
-import { Button } from "@/components/ui/button";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Heart, Home, Clock, Calendar } from "lucide-react";
+import { useState } from "react";
+import PageLayout from "../../components/PageLayout";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { BarChart, DollarSign, Users, Building, Calendar, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,153 +11,329 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-
-// Define the type for applications
-type Application = {
-  id: number;
-  petName: string;
-  applicantName: string;
-  date: string;
-  status: "pending" | "approved" | "rejected";
-}
-
-// Mock data for charts
-const petActivityData = [
-  { name: 'Jan', adoptions: 4, additions: 6 },
-  { name: 'Feb', adoptions: 3, additions: 2 },
-  { name: 'Mar', adoptions: 5, additions: 4 },
-  { name: 'Apr', adoptions: 7, additions: 3 },
-  { name: 'May', adoptions: 2, additions: 5 },
-  { name: 'Jun', adoptions: 6, additions: 4 },
-];
-
-// Mock data for applications specific to this shelter
-const shelterApplications: Application[] = [
-  { id: 1, petName: "Max", applicantName: "John Doe", date: "2023-09-15", status: "pending" },
-  { id: 2, petName: "Bella", applicantName: "Jane Smith", date: "2023-09-14", status: "approved" },
-  { id: 3, petName: "Charlie", applicantName: "Mike Johnson", date: "2023-09-13", status: "rejected" },
-];
-
-const ApplicationTable = ({ applications }: { applications: Application[] }) => {
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Pet Name</TableHead>
-            <TableHead>Applicant</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {applications.map((application) => (
-            <TableRow key={application.id}>
-              <TableCell>#{application.id}</TableCell>
-              <TableCell>{application.petName}</TableCell>
-              <TableCell>{application.applicantName}</TableCell>
-              <TableCell>{application.date}</TableCell>
-              <TableCell>
-                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                  application.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                  application.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {application.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm">View</Button>
-                <Button variant="ghost" size="sm">Edit</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-};
+} from "../../components/ui/table";
 
 const ShelterDashboard = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Mock data for the dashboard
+  const stats = [
+    {
+      title: "Total Pets",
+      value: "42",
+      icon: <Building className="h-4 w-4 text-muted-foreground" />,
+      change: "+12.5%",
+      changeType: "positive",
+    },
+    {
+      title: "Adoptions",
+      value: "24",
+      icon: <Users className="h-4 w-4 text-muted-foreground" />,
+      change: "+18.2%",
+      changeType: "positive",
+    },
+    {
+      title: "Applications",
+      value: "36",
+      icon: <Calendar className="h-4 w-4 text-muted-foreground" />,
+      change: "+8.4%",
+      changeType: "positive",
+    },
+    {
+      title: "Donations",
+      value: "$4,891",
+      icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
+      change: "-2.5%",
+      changeType: "negative",
+    },
+  ];
+
+  const recentApplications = [
+    {
+      id: "APP-1234",
+      applicant: "John Smith",
+      pet: "Max (Golden Retriever)",
+      date: "2023-09-15",
+      status: "Pending",
+    },
+    {
+      id: "APP-1235",
+      applicant: "Sarah Johnson",
+      pet: "Bella (Siamese Cat)",
+      date: "2023-09-14",
+      status: "Approved",
+    },
+    {
+      id: "APP-1236",
+      applicant: "Michael Brown",
+      pet: "Charlie (Labrador)",
+      date: "2023-09-12",
+      status: "Rejected",
+    },
+    {
+      id: "APP-1237",
+      applicant: "Emily Davis",
+      pet: "Luna (Maine Coon)",
+      date: "2023-09-10",
+      status: "Pending",
+    },
+    {
+      id: "APP-1238",
+      applicant: "David Wilson",
+      pet: "Rocky (German Shepherd)",
+      date: "2023-09-08",
+      status: "Approved",
+    },
+  ];
+
   return (
-    <ShelterLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Shelter Dashboard</h1>
-          <Button variant="outline">Export Data</Button>
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard 
-            title="Active Pets" 
-            value="32" 
-            icon={<Home className="h-6 w-6" />} 
-            note="12 dogs, 14 cats, 6 others"
-          />
-          <StatCard 
-            title="Pending Applications" 
-            value="8" 
-            icon={<Clock className="h-6 w-6" />} 
-            note="3 new this week"
-          />
-          <StatCard 
-            title="Adopted this Month" 
-            value="15" 
-            icon={<Heart className="h-6 w-6" />} 
-            note="+30% from last month"
-          />
-          <StatCard 
-            title="Upcoming Appointments" 
-            value="5" 
-            icon={<Calendar className="h-6 w-6" />} 
-            note="Next: Tomorrow at 2:00 PM"
-          />
-        </div>
-
-        {/* Pet Activity Chart */}
-        <div className="bg-white p-6 rounded-lg border">
-          <h2 className="text-lg font-semibold mb-2">Pet Activity</h2>
-          <p className="text-sm text-gray-500 mb-4">Monthly adoptions and new additions</p>
-          
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={petActivityData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="adoptions" 
-                  name="Adoptions" 
-                  stroke="#14b8a6" 
-                  activeDot={{ r: 8 }} 
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="additions" 
-                  name="New Additions" 
-                  stroke="#6366f1" 
-                />
-              </LineChart>
-            </ResponsiveContainer>
+    <PageLayout userRole="shelter" userName="Shelter Staff">
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome to your shelter dashboard, manage your pets and applications.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button>
+              <Calendar className="mr-2 h-4 w-4" />
+              View Calendar
+            </Button>
+            <Button variant="outline">
+              <BarChart className="mr-2 h-4 w-4" />
+              View Reports
+            </Button>
           </div>
         </div>
 
-        {/* Recent Applications */}
-        <div className="bg-white p-6 rounded-lg border">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Recent Applications</h2>
-            <Button variant="link">View All</Button>
-          </div>
-          <ApplicationTable applications={shelterApplications} />
-        </div>
+        <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {stats.map((stat, index) => (
+                <Card key={index}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {stat.title}
+                    </CardTitle>
+                    {stat.icon}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <p className="text-xs text-muted-foreground flex items-center">
+                      {stat.changeType === "positive" ? (
+                        <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
+                      ) : (
+                        <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
+                      )}
+                      <span className={stat.changeType === "positive" ? "text-green-500" : "text-red-500"}>
+                        {stat.change}
+                      </span>
+                      {" from last month"}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-4">
+                <CardHeader>
+                  <CardTitle>Recent Applications</CardTitle>
+                  <CardDescription>
+                    You have received {recentApplications.length} applications this month.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Application ID</TableHead>
+                        <TableHead>Applicant</TableHead>
+                        <TableHead>Pet</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {recentApplications.map((application) => (
+                        <TableRow key={application.id}>
+                          <TableCell className="font-medium">{application.id}</TableCell>
+                          <TableCell>{application.applicant}</TableCell>
+                          <TableCell>{application.pet}</TableCell>
+                          <TableCell>{application.date}</TableCell>
+                          <TableCell>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                application.status === "Approved"
+                                  ? "bg-green-100 text-green-800"
+                                  : application.status === "Rejected"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {application.status}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+              <Card className="col-span-3">
+                <CardHeader>
+                  <CardTitle>Upcoming Events</CardTitle>
+                  <CardDescription>
+                    You have 3 events scheduled for this week.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Adoption Day</p>
+                        <p className="text-xs text-muted-foreground">
+                          Saturday, 10:00 AM - 4:00 PM
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Volunteer Training</p>
+                        <p className="text-xs text-muted-foreground">
+                          Wednesday, 6:00 PM - 8:00 PM
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Fundraising Gala</p>
+                        <p className="text-xs text-muted-foreground">
+                          Friday, 7:00 PM - 10:00 PM
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          <TabsContent value="analytics" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics</CardTitle>
+                <CardDescription>
+                  View detailed analytics about your shelter operations.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-[400px] flex items-center justify-center">
+                <p className="text-muted-foreground">Analytics charts will appear here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="reports" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Reports</CardTitle>
+                <CardDescription>
+                  Generate and download reports about your shelter activities.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button variant="outline" className="h-auto p-4 justify-start items-start text-left">
+                      <div>
+                        <h3 className="font-medium">Monthly Adoption Report</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Summary of all adoptions processed in the current month
+                        </p>
+                      </div>
+                    </Button>
+                    <Button variant="outline" className="h-auto p-4 justify-start items-start text-left">
+                      <div>
+                        <h3 className="font-medium">Financial Summary</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Overview of donations, expenses, and budget allocation
+                        </p>
+                      </div>
+                    </Button>
+                    <Button variant="outline" className="h-auto p-4 justify-start items-start text-left">
+                      <div>
+                        <h3 className="font-medium">Pet Inventory</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Current list of all pets in your shelter with details
+                        </p>
+                      </div>
+                    </Button>
+                    <Button variant="outline" className="h-auto p-4 justify-start items-start text-left">
+                      <div>
+                        <h3 className="font-medium">Volunteer Hours</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Summary of volunteer participation and hours contributed
+                        </p>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="notifications" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notifications</CardTitle>
+                <CardDescription>
+                  Stay updated with the latest activities and alerts.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border-l-4 border-blue-500 pl-4 py-2">
+                    <p className="font-medium">New Application Received</p>
+                    <p className="text-sm text-muted-foreground">
+                      Emily Davis has applied to adopt Luna (Maine Coon)
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                  </div>
+                  <div className="border-l-4 border-green-500 pl-4 py-2">
+                    <p className="font-medium">Adoption Approved</p>
+                    <p className="text-sm text-muted-foreground">
+                      The application for Bella (Siamese Cat) has been approved by the hospital
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">Yesterday</p>
+                  </div>
+                  <div className="border-l-4 border-yellow-500 pl-4 py-2">
+                    <p className="font-medium">Low Inventory Alert</p>
+                    <p className="text-sm text-muted-foreground">
+                      Cat food supplies are running low. Please reorder soon.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">2 days ago</p>
+                  </div>
+                  <div className="border-l-4 border-purple-500 pl-4 py-2">
+                    <p className="font-medium">Event Reminder</p>
+                    <p className="text-sm text-muted-foreground">
+                      Adoption Day is scheduled for this Saturday. 5 volunteers confirmed.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">3 days ago</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
-    </ShelterLayout>
+    </PageLayout>
   );
 };
 
