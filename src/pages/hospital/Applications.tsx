@@ -28,7 +28,7 @@ const initialApplications = [
     approvals: {
       admin: false,
       hospital: false,
-      shelter: false,
+      shelter: true,
     }
   },
   {
@@ -44,7 +44,7 @@ const initialApplications = [
     approvals: {
       admin: true,
       hospital: false,
-      shelter: false,
+      shelter: true,
     }
   },
   {
@@ -80,7 +80,7 @@ const initialApplications = [
   },
 ];
 
-const ShelterApplications = () => {
+const HospitalApplications = () => {
   const { toast } = useToast();
   const [applications, setApplications] = useState(initialApplications);
   const [searchQuery, setSearchQuery] = useState("");
@@ -103,7 +103,7 @@ const ShelterApplications = () => {
     setApplications(prev => 
       prev.map(app => {
         if (app.id === id) {
-          const newApprovals = { ...app.approvals, shelter: true };
+          const newApprovals = { ...app.approvals, hospital: true };
           const allApproved = 
             newApprovals.admin && 
             newApprovals.hospital && 
@@ -132,7 +132,7 @@ const ShelterApplications = () => {
           return { 
             ...app, 
             status: "rejected",
-            approvals: { ...app.approvals, shelter: false }
+            approvals: { ...app.approvals, hospital: false }
           };
         }
         return app;
@@ -146,7 +146,7 @@ const ShelterApplications = () => {
   };
 
   return (
-    <PageLayout userRole="shelter" userName="Happy Paws Shelter">
+    <PageLayout userRole="hospital" userName="City Pet Hospital">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Applications Management</h1>
@@ -200,7 +200,7 @@ const ShelterApplications = () => {
           <h2 className="text-lg font-semibold mb-4">Pet Adoption & Fostering Applications</h2>
           <ApplicationTable 
             applications={filteredApplications} 
-            userRole="shelter"
+            userRole="hospital"
             onApprove={handleApprove}
             onReject={handleReject}
           />
@@ -210,4 +210,4 @@ const ShelterApplications = () => {
   );
 };
 
-export default ShelterApplications;
+export default HospitalApplications;

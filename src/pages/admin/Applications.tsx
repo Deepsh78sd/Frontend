@@ -1,104 +1,155 @@
 
-import AdminLayout from "@/components/layouts/AdminLayout";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useState } from "react";
+import PageLayout from "../../components/PageLayout";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import ApplicationTable from "../../components/ApplicationTable";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { Search, Filter } from "lucide-react";
+import { useToast } from "../../components/ui/use-toast";
 
-// Define the type for applications
-type Application = {
-  id: number;
-  petName: string;
-  applicantName: string;
-  date: string;
-  status: "pending" | "approved" | "rejected";
-}
-
-// Mock data for applications
-const applications: Application[] = [
-  { id: 1, petName: "Max", applicantName: "John Doe", date: "2023-09-15", status: "pending" },
-  { id: 2, petName: "Bella", applicantName: "Jane Smith", date: "2023-09-14", status: "approved" },
-  { id: 3, petName: "Charlie", applicantName: "Mike Johnson", date: "2023-09-13", status: "rejected" },
-  { id: 4, petName: "Luna", applicantName: "Sarah Williams", date: "2023-09-12", status: "pending" },
-  { id: 5, petName: "Cooper", applicantName: "Alex Brown", date: "2023-09-11", status: "approved" },
-  { id: 6, petName: "Daisy", applicantName: "Emma Wilson", date: "2023-09-10", status: "pending" },
-  { id: 7, petName: "Rocky", applicantName: "David Miller", date: "2023-09-09", status: "rejected" },
-  { id: 8, petName: "Lola", applicantName: "Olivia Davis", date: "2023-09-08", status: "pending" },
-  { id: 9, petName: "Teddy", applicantName: "Daniel Thomas", date: "2023-09-07", status: "approved" },
-  { id: 10, petName: "Roxy", applicantName: "Sophia Anderson", date: "2023-09-06", status: "pending" },
+// Sample applications data
+const initialApplications = [
+  {
+    id: "app-123456",
+    petName: "Max",
+    petId: "pet-001",
+    applicantName: "John Doe",
+    applicantId: "user-001",
+    date: new Date("2025-03-15"),
+    type: "adoption" as const,
+    status: "pending" as const,
+    approvals: {
+      admin: false,
+      hospital: false,
+      shelter: true,
+    }
+  },
+  {
+    id: "app-234567",
+    petName: "Bella",
+    petId: "pet-002",
+    applicantName: "Jane Smith",
+    applicantId: "user-002",
+    date: new Date("2025-03-14"),
+    type: "fostering" as const,
+    status: "processing" as const,
+    fosterDays: 30,
+    approvals: {
+      admin: false,
+      hospital: true,
+      shelter: true,
+    }
+  },
+  {
+    id: "app-345678",
+    petName: "Charlie",
+    petId: "pet-003",
+    applicantName: "Mike Johnson",
+    applicantId: "user-003",
+    date: new Date("2025-03-13"),
+    type: "adoption" as const,
+    status: "approved" as const,
+    approvals: {
+      admin: true,
+      hospital: true,
+      shelter: true,
+    }
+  },
+  {
+    id: "app-456789",
+    petName: "Luna",
+    petId: "pet-004",
+    applicantName: "Sarah Williams",
+    applicantId: "user-004",
+    date: new Date("2025-03-12"),
+    type: "fostering" as const,
+    status: "rejected" as const,
+    fosterDays: 14,
+    approvals: {
+      admin: false,
+      hospital: false,
+      shelter: false,
+    }
+  },
 ];
 
-const ApplicationTable = ({ applications }: { applications: Application[] }) => {
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Pet Name</TableHead>
-            <TableHead>Applicant</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {applications.map((application) => (
-            <TableRow key={application.id}>
-              <TableCell>#{application.id}</TableCell>
-              <TableCell>{application.petName}</TableCell>
-              <TableCell>{application.applicantName}</TableCell>
-              <TableCell>{application.date}</TableCell>
-              <TableCell>
-                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                  application.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                  application.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {application.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm">View</Button>
-                <Button variant="ghost" size="sm">Edit</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-};
-
 const AdminApplications = () => {
+  const { toast } = useToast();
+  const [applications, setApplications] = useState(initialApplications);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   
-  // Filter applications based on search query and status
+  // Filter applications based on search and filters
   const filteredApplications = applications.filter(app => {
     const matchesSearch = 
       app.petName.toLowerCase().includes(searchQuery.toLowerCase()) || 
       app.applicantName.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || app.status === statusFilter;
+    const matchesType = typeFilter === "all" || app.type === typeFilter;
     
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesType;
   });
 
+  const handleApprove = (id: string) => {
+    setApplications(prev => 
+      prev.map(app => {
+        if (app.id === id) {
+          const newApprovals = { ...app.approvals, admin: true };
+          const allApproved = 
+            newApprovals.admin && 
+            newApprovals.hospital && 
+            newApprovals.shelter;
+          
+          return {
+            ...app,
+            approvals: newApprovals,
+            status: allApproved ? "approved" : "processing"
+          };
+        }
+        return app;
+      })
+    );
+    
+    toast({
+      title: "Application approved",
+      description: "You have approved this application. If all other parties approve, it will be finalized.",
+    });
+  };
+
+  const handleReject = (id: string) => {
+    setApplications(prev => 
+      prev.map(app => {
+        if (app.id === id) {
+          return { 
+            ...app, 
+            status: "rejected",
+            approvals: { ...app.approvals, admin: false }
+          };
+        }
+        return app;
+      })
+    );
+    
+    toast({
+      title: "Application rejected",
+      description: "You have rejected this application. The applicant will be notified.",
+    });
+  };
+
   return (
-    <AdminLayout>
+    <PageLayout userRole="admin" userName="Admin User">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Application Management</h1>
+          <h1 className="text-2xl font-bold">Applications Management</h1>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
@@ -106,7 +157,7 @@ const AdminApplications = () => {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input 
               type="search" 
-              placeholder="Search applications..." 
+              placeholder="Search by pet or applicant..." 
               className="pl-8" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -121,8 +172,20 @@ const AdminApplications = () => {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="processing">Processing</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="adoption">Adoption</SelectItem>
+                <SelectItem value="fostering">Fostering</SelectItem>
               </SelectContent>
             </Select>
             
@@ -134,11 +197,16 @@ const AdminApplications = () => {
         </div>
 
         <div className="bg-white p-6 rounded-lg border">
-          <h2 className="text-lg font-semibold mb-4">Adoption Applications</h2>
-          <ApplicationTable applications={filteredApplications} />
+          <h2 className="text-lg font-semibold mb-4">Pet Adoption & Fostering Applications</h2>
+          <ApplicationTable 
+            applications={filteredApplications} 
+            userRole="admin"
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
         </div>
       </div>
-    </AdminLayout>
+    </PageLayout>
   );
 };
 
