@@ -104,6 +104,11 @@ const AdopterPetsPage = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Type-safe handler for Select component
+  const handleFilterChange = (value: string) => {
+    setFilter(value as "all" | StatusType);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -131,7 +136,7 @@ const AdopterPetsPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Select value={filter} onValueChange={setFilter}>
+        <Select value={filter} onValueChange={handleFilterChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>

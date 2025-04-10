@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
@@ -51,6 +52,11 @@ const ShelterPets = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Type-safe handler for Select component
+  const handleFilterChange = (value: string) => {
+    setFilterStatus(value as "all" | StatusType);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -75,7 +81,7 @@ const ShelterPets = () => {
           />
         </div>
         
-        <Select defaultValue={filterStatus} onValueChange={setFilterStatus}>
+        <Select defaultValue={filterStatus} onValueChange={handleFilterChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
