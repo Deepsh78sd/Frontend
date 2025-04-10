@@ -15,6 +15,7 @@ import {
   CardTitle 
 } from "../components/ui/card";
 import { useToast } from "../components/ui/use-toast";
+import PhotoUpload from "../components/PhotoUpload";
 
 // Mock user data (in a real app, this would come from your auth context/api)
 const mockUser = {
@@ -46,6 +47,10 @@ const UserProfile = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setUserData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhotoChange = (photoUrl: string) => {
+    setUserData(prev => ({ ...prev, photoUrl }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -139,15 +144,11 @@ const UserProfile = () => {
                     />
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="photoUrl">Profile Photo URL</Label>
-                    <Input 
-                      id="photoUrl"
-                      name="photoUrl"
-                      value={userData.photoUrl}
-                      onChange={handleChange}
-                    />
-                  </div>
+                  <PhotoUpload 
+                    initialPhoto={userData.photoUrl}
+                    onPhotoChange={handlePhotoChange}
+                    label="Profile Photo"
+                  />
                 </>
               ) : (
                 <div className="space-y-6">

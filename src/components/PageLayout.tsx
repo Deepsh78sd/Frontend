@@ -1,8 +1,7 @@
 
 import { ReactNode, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { Home, Heart, FileText, Calendar, BookOpen, User, LogOut, Dog, Menu, X } from "lucide-react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Home, Heart, FileText, Calendar, BookOpen, User, LogOut, Dog, Menu, X, Info } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import {
@@ -23,6 +22,7 @@ interface PageLayoutProps {
 
 const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,6 +42,7 @@ const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) 
           { name: "Dashboard", path: "/shelter/dashboard", icon: <Home className="w-5 h-5" /> },
           { name: "Applications", path: "/shelter/applications", icon: <FileText className="w-5 h-5" /> },
           { name: "Pets", path: "/shelter/pets", icon: <Dog className="w-5 h-5" /> },
+          { name: "History", path: "/shelter/history", icon: <Calendar className="w-5 h-5" /> },
           { name: "Pet Care", path: "/shelter/petcare", icon: <BookOpen className="w-5 h-5" /> }
         ];
       case 'hospital':
@@ -58,7 +59,8 @@ const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) 
           { name: "My Pets", path: "/adopter/mypets", icon: <Dog className="w-5 h-5" /> },
           { name: "Applications", path: "/adopter/applications", icon: <FileText className="w-5 h-5" /> },
           { name: "Appointments", path: "/adopter/appointments", icon: <Calendar className="w-5 h-5" /> },
-          { name: "Pet Care", path: "/adopter/petcare", icon: <BookOpen className="w-5 h-5" /> }
+          { name: "Pet Care", path: "/adopter/petcare", icon: <BookOpen className="w-5 h-5" /> },
+          { name: "About Us", path: "/adopter/about", icon: <Info className="w-5 h-5" /> }
         ];
       default:
         return [];
@@ -88,6 +90,10 @@ const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) 
 
   // Only adopter should have a footer
   const showFooter = userRole === 'adopter';
+  
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -122,7 +128,7 @@ const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) 
                 to={item.path}
                 className={cn(
                   "flex items-center text-sm font-medium",
-                  location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
+                  isActive(item.path)
                     ? "text-teal-600"
                     : "text-gray-700 hover:text-teal-600"
                 )}
@@ -167,7 +173,7 @@ const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) 
                   to={item.path}
                   className={cn(
                     "flex items-center py-2 px-3 rounded-md text-sm font-medium",
-                    location.pathname === item.path
+                    isActive(item.path)
                       ? "bg-teal-50 text-teal-600"
                       : "hover:bg-gray-100"
                   )}
