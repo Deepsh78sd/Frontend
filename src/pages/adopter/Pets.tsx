@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -17,7 +17,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "../../components/ui/card";
-import { Search, Filter, Heart, Eye } from "lucide-react";
+import { Search, Filter, Heart, Eye, Upload } from "lucide-react";
 import StatusBadge, { StatusType } from "../../components/StatusBadge";
 import { withPageLayout } from "../../utils/layoutHelper";
 import { useToast } from "../../components/ui/use-toast";
@@ -27,6 +27,7 @@ const AdopterPetsPage = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | StatusType>("all");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock pet data
   const [pets, setPets] = useState([
@@ -73,7 +74,6 @@ const AdopterPetsPage = () => {
   ]);
 
   const handleSearch = () => {
-    // In a real app, this would trigger an API call with the search query
     toast({
       title: "Searching for pets",
       description: `Search query: ${searchQuery}`
@@ -89,6 +89,23 @@ const AdopterPetsPage = () => {
       title: "Adoption Request Submitted",
       description: "Your request has been submitted successfully!"
     });
+  };
+
+  const handlePhotoUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      toast({
+        title: "Photo Uploaded",
+        description: `Successfully uploaded: ${file.name}`
+      });
+      // In a real app, you would process the file here
+    }
   };
 
   const filteredPets = pets.filter(pet => {
@@ -122,6 +139,17 @@ const AdopterPetsPage = () => {
             <Filter className="mr-2 h-4 w-4" />
             More Filters
           </Button>
+          <Button variant="outline" onClick={handlePhotoUpload}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload Pet Photo
+          </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
         </div>
       </div>
 

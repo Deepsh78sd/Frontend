@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { PlusCircle, Search, Filter, Eye, Pencil, Trash } from "lucide-react";
 import { Input } from "../../components/ui/input";
@@ -15,8 +15,11 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import StatusBadge, { StatusType } from "../../components/StatusBadge";
 import { withPageLayout } from "../../utils/layoutHelper";
+import { useToast } from "../../components/ui/use-toast";
 
 const ShelterPets = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [pets, setPets] = useState([
     { id: 1, name: "Max", type: "Dog", breed: "Golden Retriever", age: "2 years", status: "available" as StatusType },
     { id: 2, name: "Bella", type: "Cat", breed: "Maine Coon", age: "3 years", status: "pending" as StatusType },
@@ -29,16 +32,20 @@ const ShelterPets = () => {
   const [filterStatus, setFilterStatus] = useState<"all" | StatusType>("all");
 
   const handleView = (id: number) => {
-    window.location.href = `/shelter/pets/${id}`;
+    navigate(`/shelter/pets/${id}`);
   };
 
   const handleEdit = (id: number) => {
-    window.location.href = `/shelter/pets/${id}/edit`;
+    navigate(`/shelter/pets/${id}/edit`);
   };
 
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this pet?")) {
       setPets(pets.filter(pet => pet.id !== id));
+      toast({
+        title: "Pet deleted",
+        description: "The pet has been removed from the database.",
+      });
     }
   };
 
