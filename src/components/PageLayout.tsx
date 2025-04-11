@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import TopNavBar from "./TopNavBar";
+import TopNavbar from "./TopNavbar";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -21,7 +21,7 @@ const PageLayout = ({ children, userRole, userName = "User" }: PageLayoutProps) 
 
   return (
     <div className="flex min-h-screen flex-col">
-      <TopNavBar userRole={userRole} userName={displayName} />
+      <TopNavbar userRole={userRole} userName={displayName} />
       <main className="flex-1 p-6 bg-gray-50">
         {children}
       </main>
