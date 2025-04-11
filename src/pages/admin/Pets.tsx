@@ -1,7 +1,9 @@
 
-import AdminLayout from "../../components/layouts/AdminLayout";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import PageLayout from "@/components/PageLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -9,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
+} from "@/components/ui/table";
 import { Search, Filter, Plus } from "lucide-react";
 import {
   Select,
@@ -17,31 +19,68 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { Link } from "react-router-dom";
-import StatusBadge from "../../components/StatusBadge";
+} from "@/components/ui/select";
+import StatusBadge from "@/components/StatusBadge";
+import ActionButtons from "@/components/ActionButtons";
+import { useToast } from "@/components/ui/use-toast";
 
 // Pet type enum mapping
 const petTypes = ["Dog", "Cat", "Bird", "Other"];
 
 // Availability status enum mapping
-const availabilityStatuses = ["Available", "Adopted", "Fostered", "Not Available"];
+const availabilityStatuses = ["available", "adopted", "fostered", "pending"];
 
 // Mock data for pets
-const pets = [
-  { id: 1, name: "Max", species: petTypes[0], breed: "Golden Retriever", age: "2 years", shelter: "Happy Paws Shelter", availabilityStatus: 0 },
-  { id: 2, name: "Bella", species: petTypes[1], breed: "Siamese", age: "1 year", shelter: "Furry Friends Rescue", availabilityStatus: 1 },
-  { id: 3, name: "Charlie", species: petTypes[0], breed: "Beagle", age: "3 years", shelter: "Second Chance Animal Shelter", availabilityStatus: 0 },
-  { id: 4, name: "Luna", species: petTypes[1], breed: "Persian", age: "4 years", shelter: "Happy Paws Shelter", availabilityStatus: 2 },
-  { id: 5, name: "Cooper", species: petTypes[0], breed: "Labrador Retriever", age: "1 year", shelter: "Forever Home Society", availabilityStatus: 0 },
-  { id: 6, name: "Lucy", species: petTypes[1], breed: "Maine Coon", age: "2 years", shelter: "Loving Care Animal Rescue", availabilityStatus: 0 },
-  { id: 7, name: "Bailey", species: petTypes[0], breed: "German Shepherd", age: "5 years", shelter: "Safe Haven Pet Sanctuary", availabilityStatus: 1 },
-  { id: 8, name: "Oliver", species: petTypes[1], breed: "Ragdoll", age: "3 years", shelter: "New Beginnings Animal Shelter", availabilityStatus: 0 },
+const petsData = [
+  { id: 1, name: "Max", species: petTypes[0], breed: "Golden Retriever", age: "2 years", shelter: "Happy Paws Shelter", availabilityStatus: availabilityStatuses[0] },
+  { id: 2, name: "Bella", species: petTypes[1], breed: "Siamese", age: "1 year", shelter: "Furry Friends Rescue", availabilityStatus: availabilityStatuses[1] },
+  { id: 3, name: "Charlie", species: petTypes[0], breed: "Beagle", age: "3 years", shelter: "Second Chance Animal Shelter", availabilityStatus: availabilityStatuses[0] },
+  { id: 4, name: "Luna", species: petTypes[1], breed: "Persian", age: "4 years", shelter: "Happy Paws Shelter", availabilityStatus: availabilityStatuses[2] },
+  { id: 5, name: "Cooper", species: petTypes[0], breed: "Labrador Retriever", age: "1 year", shelter: "Forever Home Society", availabilityStatus: availabilityStatuses[0] },
+  { id: 6, name: "Lucy", species: petTypes[1], breed: "Maine Coon", age: "2 years", shelter: "Loving Care Animal Rescue", availabilityStatus: availabilityStatuses[0] },
+  { id: 7, name: "Bailey", species: petTypes[0], breed: "German Shepherd", age: "5 years", shelter: "Safe Haven Pet Sanctuary", availabilityStatus: availabilityStatuses[1] },
+  { id: 8, name: "Oliver", species: petTypes[1], breed: "Ragdoll", age: "3 years", shelter: "New Beginnings Animal Shelter", availabilityStatus: availabilityStatuses[0] },
 ];
 
 const AdminPets = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [pets, setPets] = useState(petsData);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [speciesFilter, setSpeciesFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Filter pets based on search query and filters
+  const filteredPets = pets.filter(pet => {
+    const matchesSearch = 
+      pet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pet.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pet.shelter.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesSpecies = speciesFilter === "all" || pet.species === speciesFilter;
+    const matchesStatus = statusFilter === "all" || pet.availabilityStatus === statusFilter;
+    
+    return matchesSearch && matchesSpecies && matchesStatus;
+  });
+
+  const handleView = (id: number) => {
+    navigate(`/admin/pets/${id}`);
+  };
+
+  const handleEdit = (id: number) => {
+    navigate(`/admin/pets/${id}/edit`);
+  };
+
+  const handleDelete = (id: number) => {
+    setPets(pets.filter(pet => pet.id !== id));
+    toast({
+      title: "Pet deleted",
+      description: "The pet has been removed from the database.",
+    });
+  };
+
   return (
-    <AdminLayout>
+    <PageLayout userRole="admin" userName="Admin User">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Pet Management</h1>
@@ -60,32 +99,35 @@ const AdminPets = () => {
               type="search" 
               placeholder="Search pets..." 
               className="pl-8" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           
           <div className="flex gap-3">
-            <Select defaultValue="all">
+            <Select defaultValue={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="0">Available</SelectItem>
-                <SelectItem value="1">Adopted</SelectItem>
-                <SelectItem value="2">Fostered</SelectItem>
+                <SelectItem value="available">Available</SelectItem>
+                <SelectItem value="adopted">Adopted</SelectItem>
+                <SelectItem value="fostered">Fostered</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
               </SelectContent>
             </Select>
             
-            <Select defaultValue="all">
+            <Select defaultValue={speciesFilter} onValueChange={setSpeciesFilter}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by species" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Species</SelectItem>
-                <SelectItem value="0">Dog</SelectItem>
-                <SelectItem value="1">Cat</SelectItem>
-                <SelectItem value="2">Bird</SelectItem>
-                <SelectItem value="3">Other</SelectItem>
+                <SelectItem value="Dog">Dog</SelectItem>
+                <SelectItem value="Cat">Cat</SelectItem>
+                <SelectItem value="Bird">Bird</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
             </Select>
             
@@ -105,40 +147,47 @@ const AdminPets = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Species</TableHead>
-                  <TableHead>Breed</TableHead>
-                  <TableHead>Age</TableHead>
-                  <TableHead>Shelter</TableHead>
+                  <TableHead className="hidden md:table-cell">Breed</TableHead>
+                  <TableHead className="hidden md:table-cell">Age</TableHead>
+                  <TableHead className="hidden md:table-cell">Shelter</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pets.map((pet) => (
-                  <TableRow key={pet.id}>
-                    <TableCell className="font-medium">{pet.name}</TableCell>
-                    <TableCell>{pet.species}</TableCell>
-                    <TableCell>{pet.breed}</TableCell>
-                    <TableCell>{pet.age}</TableCell>
-                    <TableCell>{pet.shelter}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={availabilityStatuses[pet.availabilityStatus].toLowerCase() as any} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/admin/pets/${pet.id}`}>View</Link>
-                      </Button>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/admin/pets/${pet.id}/edit`}>Edit</Link>
-                      </Button>
+                {filteredPets.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      No pets found matching your criteria
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredPets.map((pet) => (
+                    <TableRow key={pet.id}>
+                      <TableCell className="font-medium">{pet.name}</TableCell>
+                      <TableCell>{pet.species}</TableCell>
+                      <TableCell className="hidden md:table-cell">{pet.breed}</TableCell>
+                      <TableCell className="hidden md:table-cell">{pet.age}</TableCell>
+                      <TableCell className="hidden md:table-cell">{pet.shelter}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={pet.availabilityStatus as any} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <ActionButtons
+                          onView={() => handleView(pet.id)}
+                          onEdit={() => handleEdit(pet.id)}
+                          onDelete={() => handleDelete(pet.id)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </PageLayout>
   );
 };
 

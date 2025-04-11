@@ -1,5 +1,7 @@
 
-import HospitalLayout from "@/components/layouts/HospitalLayout";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import PageLayout from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import StatusBadge, { StatusType } from "@/components/StatusBadge";
+import ActionButtons from "@/components/ActionButtons";
 import {
   Dialog,
   DialogContent,
@@ -27,25 +32,54 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+
+// Define the appointment interface
+interface Appointment {
+  id: number;
+  petName: string;
+  petOwner: string;
+  date: string;
+  time: string;
+  reason: string;
+  status: StatusType;
+  notes?: string;
+}
 
 // Mock data for appointments
-const appointments = [
-  { id: 1, petName: "Max", petOwner: "John Doe", date: "2023-09-15", time: "10:00 AM", reason: "Health check for adoption", status: "scheduled" },
-  { id: 2, petName: "Bella", petOwner: "Jane Smith", date: "2023-09-16", time: "11:30 AM", reason: "Vaccination check", status: "scheduled" },
-  { id: 3, petName: "Charlie", petOwner: "Mike Johnson", date: "2023-09-17", time: "2:00 PM", reason: "Pre-adoption examination", status: "completed" },
-  { id: 4, petName: "Luna", petOwner: "Sarah Williams", date: "2023-09-17", time: "3:30 PM", reason: "Health verification", status: "canceled" },
-  { id: 5, petName: "Cooper", petOwner: "David Brown", date: "2023-09-18", time: "9:15 AM", reason: "Health check for adoption", status: "scheduled" },
-  { id: 6, petName: "Lucy", petOwner: "Emma Davis", date: "2023-09-19", time: "2:30 PM", reason: "Pre-adoption examination", status: "scheduled" },
-  { id: 7, petName: "Bailey", petOwner: "Alex Wilson", date: "2023-09-20", time: "10:45 AM", reason: "Vaccination check", status: "scheduled" },
-  { id: 8, petName: "Oliver", petOwner: "Olivia Lee", date: "2023-09-21", time: "4:00 PM", reason: "Health verification", status: "scheduled" },
+const appointmentsData: Appointment[] = [
+  { id: 1, petName: "Max", petOwner: "John Doe", date: "2025-04-15", time: "10:00 AM", reason: "Health check for adoption", status: "scheduled" as StatusType },
+  { id: 2, petName: "Bella", petOwner: "Jane Smith", date: "2025-04-16", time: "11:30 AM", reason: "Vaccination check", status: "scheduled" as StatusType },
+  { id: 3, petName: "Charlie", petOwner: "Mike Johnson", date: "2025-04-17", time: "2:00 PM", reason: "Pre-adoption examination", status: "completed" as StatusType },
+  { id: 4, petName: "Luna", petOwner: "Sarah Williams", date: "2025-04-17", time: "3:30 PM", reason: "Health verification", status: "canceled" as StatusType },
+  { id: 5, petName: "Cooper", petOwner: "David Brown", date: "2025-04-18", time: "9:15 AM", reason: "Health check for adoption", status: "scheduled" as StatusType },
+  { id: 6, petName: "Lucy", petOwner: "Emma Davis", date: "2025-04-19", time: "2:30 PM", reason: "Pre-adoption examination", status: "scheduled" as StatusType },
+  { id: 7, petName: "Bailey", petOwner: "Alex Wilson", date: "2025-04-20", time: "10:45 AM", reason: "Vaccination check", status: "scheduled" as StatusType },
+  { id: 8, petName: "Oliver", petOwner: "Olivia Lee", date: "2025-04-21", time: "4:00 PM", reason: "Health verification", status: "scheduled" as StatusType },
 ];
 
 const HospitalAppointments = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [filter, setFilter] = useState("all");
+  const [appointments, setAppointments] = useState<Appointment[]>(appointmentsData);
+  const [filter, setFilter] = useState<StatusType | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newAppointment, setNewAppointment] = useState({
+    petName: "",
+    petOwner: "",
+    date: "",
+    time: "",
+    reason: "",
+    notes: "",
+  });
+  
+  // Type-safe handler for filter changes
+  const handleFilterChange = (value: string) => {
+    setFilter(value as StatusType | "all");
+  };
   
   // Filter and search
   const filteredAppointments = appointments
@@ -57,13 +91,63 @@ const HospitalAppointments = () => {
     );
     
   const handleAddAppointment = () => {
+    if (!newAppointment.petName || !newAppointment.petOwner || !newAppointment.date || !newAppointment.time || !newAppointment.reason) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+    
+    setAppointments([
+      ...appointments,
+      {
+        id: newId,
+        petName: newAppointment.petName,
+        petOwner: newAppointment.petOwner,
+        date: newAppointment.date,
+        time: newAppointment.time,
+        reason: newAppointment.reason,
+        status: "scheduled" as StatusType,
+        notes: newAppointment.notes,
+      }
+    ]);
+    
+    setNewAppointment({
+      petName: "",
+      petOwner: "",
+      date: "",
+      time: "",
+      reason: "",
+      notes: "",
+    });
+    
+    setIsAddDialogOpen(false);
+    
     toast({
       title: "Appointment Created",
       description: "New appointment has been successfully scheduled.",
     });
   };
   
+  const handleViewAppointment = (id: number) => {
+    navigate(`/hospital/appointments/${id}`);
+  };
+  
+  const handleEditAppointment = (id: number) => {
+    navigate(`/hospital/appointments/${id}/edit`);
+  };
+  
   const handleComplete = (id: number) => {
+    setAppointments(appointments.map(appointment => 
+      appointment.id === id 
+        ? { ...appointment, status: "completed" as StatusType } 
+        : appointment
+    ));
+    
     toast({
       title: "Appointment Completed",
       description: "The appointment has been marked as completed.",
@@ -71,6 +155,12 @@ const HospitalAppointments = () => {
   };
   
   const handleCancel = (id: number) => {
+    setAppointments(appointments.map(appointment => 
+      appointment.id === id 
+        ? { ...appointment, status: "canceled" as StatusType } 
+        : appointment
+    ));
+    
     toast({
       title: "Appointment Canceled",
       description: "The appointment has been canceled.",
@@ -78,18 +168,18 @@ const HospitalAppointments = () => {
   };
 
   return (
-    <HospitalLayout>
+    <PageLayout userRole="hospital" userName="Hospital Staff">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">Appointment Management</h1>
-          <Dialog>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-blue-500 hover:bg-blue-600">
                 <Plus className="mr-2 h-4 w-4" />
                 New Appointment
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
                 <DialogTitle>Schedule New Appointment</DialogTitle>
                 <DialogDescription>
@@ -98,48 +188,88 @@ const HospitalAppointments = () => {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="petName" className="text-right font-medium">
+                  <Label htmlFor="petName" className="text-right">
                     Pet Name
-                  </label>
-                  <Input id="petName" className="col-span-3" />
+                  </Label>
+                  <Input 
+                    id="petName" 
+                    className="col-span-3"
+                    value={newAppointment.petName}
+                    onChange={(e) => setNewAppointment({...newAppointment, petName: e.target.value})}
+                  />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="petOwner" className="text-right font-medium">
+                  <Label htmlFor="petOwner" className="text-right">
                     Pet Owner
-                  </label>
-                  <Input id="petOwner" className="col-span-3" />
+                  </Label>
+                  <Input 
+                    id="petOwner" 
+                    className="col-span-3"
+                    value={newAppointment.petOwner}
+                    onChange={(e) => setNewAppointment({...newAppointment, petOwner: e.target.value})}
+                  />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="date" className="text-right font-medium">
+                  <Label htmlFor="date" className="text-right">
                     Date
-                  </label>
-                  <Input id="date" type="date" className="col-span-3" />
+                  </Label>
+                  <Input 
+                    id="date" 
+                    type="date" 
+                    className="col-span-3"
+                    value={newAppointment.date}
+                    onChange={(e) => setNewAppointment({...newAppointment, date: e.target.value})}
+                  />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="time" className="text-right font-medium">
+                  <Label htmlFor="time" className="text-right">
                     Time
-                  </label>
-                  <Input id="time" type="time" className="col-span-3" />
+                  </Label>
+                  <Input 
+                    id="time" 
+                    type="time" 
+                    className="col-span-3"
+                    value={newAppointment.time}
+                    onChange={(e) => setNewAppointment({...newAppointment, time: e.target.value})}
+                  />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="reason" className="text-right font-medium">
+                  <Label htmlFor="reason" className="text-right">
                     Reason
-                  </label>
-                  <Select>
+                  </Label>
+                  <Select
+                    value={newAppointment.reason}
+                    onValueChange={(value) => setNewAppointment({...newAppointment, reason: value})}
+                  >
                     <SelectTrigger id="reason" className="col-span-3">
                       <SelectValue placeholder="Select reason" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="check">Health check for adoption</SelectItem>
-                      <SelectItem value="exam">Pre-adoption examination</SelectItem>
-                      <SelectItem value="vaccination">Vaccination check</SelectItem>
-                      <SelectItem value="verification">Health verification</SelectItem>
+                      <SelectItem value="Health check for adoption">Health check for adoption</SelectItem>
+                      <SelectItem value="Pre-adoption examination">Pre-adoption examination</SelectItem>
+                      <SelectItem value="Vaccination check">Vaccination check</SelectItem>
+                      <SelectItem value="Health verification">Health verification</SelectItem>
+                      <SelectItem value="General checkup">General checkup</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="grid grid-cols-4 items-start gap-4">
+                  <Label htmlFor="notes" className="text-right pt-2">
+                    Notes
+                  </Label>
+                  <Textarea
+                    id="notes"
+                    className="col-span-3"
+                    value={newAppointment.notes}
+                    onChange={(e) => setNewAppointment({...newAppointment, notes: e.target.value})}
+                  />
+                </div>
               </div>
               <DialogFooter>
-                <Button onClick={handleAddAppointment} className="bg-blue-500 hover:bg-blue-600">
+                <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="button" onClick={handleAddAppointment}>
                   Schedule Appointment
                 </Button>
               </DialogFooter>
@@ -153,107 +283,109 @@ const HospitalAppointments = () => {
             <Input 
               type="search" 
               placeholder="Search appointments..." 
-              className="pl-8" 
+              className="pl-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           
-          <div className="flex gap-3">
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="canceled">Canceled</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button variant="outline" className="flex items-center gap-2">
-              <Calendar size={16} />
-              View Calendar
-            </Button>
-            
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter size={16} />
-              More Filters
-            </Button>
-          </div>
+          <Select defaultValue={filter} onValueChange={handleFilterChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Appointments</SelectItem>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="canceled">Canceled</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button variant="outline" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden md:inline">View Calendar</span>
+          </Button>
         </div>
-
+        
         <div className="bg-white p-6 rounded-lg border">
           <h2 className="text-lg font-semibold mb-4">Upcoming Appointments</h2>
           
-          <div className="rounded-md border">
+          <div className="border rounded-md">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pet Name</TableHead>
+                  <TableHead>Pet</TableHead>
                   <TableHead>Owner</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Reason</TableHead>
+                  <TableHead className="hidden md:table-cell">Date & Time</TableHead>
+                  <TableHead className="hidden md:table-cell">Reason</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredAppointments.map((appointment) => (
-                  <TableRow key={appointment.id}>
-                    <TableCell className="font-medium">{appointment.petName}</TableCell>
-                    <TableCell>{appointment.petOwner}</TableCell>
-                    <TableCell>{appointment.date}</TableCell>
-                    <TableCell>{appointment.time}</TableCell>
-                    <TableCell>{appointment.reason}</TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                        appointment.status === 'scheduled' ? 'bg-blue-100 text-blue-800' : 
-                        appointment.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {appointment.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">View</Button>
-                      {appointment.status === 'scheduled' && (
-                        <>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="text-green-600 hover:text-green-700"
-                            onClick={() => handleComplete(appointment.id)}
-                          >
-                            Complete
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-gray-600 hover:text-gray-700"
-                            onClick={() => handleCancel(appointment.id)}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      )}
+                {filteredAppointments.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                      No appointments found
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredAppointments.map((appointment) => (
+                    <TableRow key={appointment.id}>
+                      <TableCell className="font-medium">{appointment.petName}</TableCell>
+                      <TableCell>{appointment.petOwner}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{appointment.reason}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={appointment.status} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <ActionButtons
+                            onView={() => handleViewAppointment(appointment.id)}
+                            onEdit={
+                              appointment.status === "scheduled" 
+                                ? () => handleEditAppointment(appointment.id) 
+                                : undefined
+                            }
+                            hideEdit={appointment.status !== "scheduled"}
+                            hideDelete={true}
+                            customButtons={
+                              appointment.status === "scheduled" ? (
+                                <>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="text-green-500 hover:text-green-700 hover:bg-green-50"
+                                    onClick={() => handleComplete(appointment.id)}
+                                  >
+                                    Complete
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    onClick={() => handleCancel(appointment.id)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </>
+                              ) : null
+                            }
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
-          
-          {filteredAppointments.length === 0 && (
-            <div className="text-center py-10">
-              <p className="text-gray-500">No appointments found matching your filters.</p>
-            </div>
-          )}
         </div>
       </div>
-    </HospitalLayout>
+    </PageLayout>
   );
 };
 

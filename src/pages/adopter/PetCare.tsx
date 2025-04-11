@@ -1,10 +1,10 @@
 
-import AdopterLayout from "@/components/layouts/AdopterLayout";
+import PageLayout from "@/components/PageLayout";
 import PetCareInfo from "@/components/ui/pet-care-info";
 
 const AdopterPetCare = () => {
   return (
-    <AdopterLayout>
+    <PageLayout userRole="adopter" userName="Adopter User">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Pet Care Information</h1>
@@ -15,7 +15,7 @@ const AdopterPetCare = () => {
           <PetCareInfo canAdd={false} canEdit={false} canDelete={false} />
         </div>
       </div>
-    </AdopterLayout>
+    </PageLayout>
   );
 };
 

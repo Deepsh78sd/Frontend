@@ -1,18 +1,18 @@
 
 import { useState } from "react";
-import PageLayout from "../../components/PageLayout";
-import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
-import ApplicationTable from "../../components/ApplicationTable";
+import PageLayout from "@/components/PageLayout";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import ApplicationTable from "@/components/ApplicationTable";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
-import { useToast } from "../../components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // Define the types for application
 type ApplicationType = "adoption" | "fostering";
@@ -154,7 +154,7 @@ const AdminApplications = () => {
     
     toast({
       title: "Application approved",
-      description: "You have approved this application. If all other parties approve, it will be finalized.",
+      description: "You have approved this application. It has been finalized.",
     });
   };
 
@@ -198,7 +198,10 @@ const AdminApplications = () => {
           </div>
           
           <div className="flex gap-3">
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as "all" | ApplicationStatus)}>
+            <Select 
+              value={statusFilter} 
+              onValueChange={(value) => setStatusFilter(value as "all" | ApplicationStatus)}
+            >
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -211,7 +214,10 @@ const AdminApplications = () => {
               </SelectContent>
             </Select>
             
-            <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as "all" | ApplicationType)}>
+            <Select 
+              value={typeFilter} 
+              onValueChange={(value) => setTypeFilter(value as "all" | ApplicationType)}
+            >
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>

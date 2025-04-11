@@ -1,18 +1,18 @@
 
 import { useState } from "react";
-import PageLayout from "../../components/PageLayout";
-import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
-import ApplicationTable from "../../components/ApplicationTable";
+import PageLayout from "@/components/PageLayout";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import ApplicationTable from "@/components/ApplicationTable";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
-import { useToast } from "../../components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // Define the types for application
 type ApplicationType = "adoption" | "fostering";
@@ -60,7 +60,7 @@ const initialApplications: Application[] = [
     status: "pending",
     approvals: {
       admin: false,
-      hospital: false,
+      hospital: true,
       shelter: false,
     }
   },
@@ -75,8 +75,8 @@ const initialApplications: Application[] = [
     status: "processing",
     fosterDays: 30,
     approvals: {
-      admin: true,
-      hospital: false,
+      admin: false,
+      hospital: true,
       shelter: false,
     }
   },
@@ -107,7 +107,7 @@ const initialApplications: Application[] = [
     fosterDays: 14,
     approvals: {
       admin: false,
-      hospital: false,
+      hospital: true,
       shelter: false,
     }
   },
@@ -179,7 +179,7 @@ const ShelterApplications = () => {
   };
 
   return (
-    <PageLayout userRole="shelter" userName="Happy Paws Shelter">
+    <PageLayout userRole="shelter" userName="Shelter Staff">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Applications Management</h1>
@@ -198,7 +198,10 @@ const ShelterApplications = () => {
           </div>
           
           <div className="flex gap-3">
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as "all" | ApplicationStatus)}>
+            <Select 
+              value={statusFilter} 
+              onValueChange={(value) => setStatusFilter(value as "all" | ApplicationStatus)}
+            >
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -211,7 +214,10 @@ const ShelterApplications = () => {
               </SelectContent>
             </Select>
             
-            <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as "all" | ApplicationType)}>
+            <Select 
+              value={typeFilter} 
+              onValueChange={(value) => setTypeFilter(value as "all" | ApplicationType)}
+            >
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>

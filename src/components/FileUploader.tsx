@@ -1,118 +1,91 @@
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { Upload, X } from "lucide-react";
-import { useToast } from "./ui/use-toast";
 
 interface FileUploaderProps {
-  onFileSelect?: (file: File) => void;
+  onFileSelect: (file: File | null) => void;
   label?: string;
   accept?: string;
-  buttonVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  className?: string;
+  initialPreview?: string;
 }
 
 const FileUploader = ({
   onFileSelect,
-  label = "Upload File",
+  label = "Upload Image",
   accept = "image/*",
-  buttonVariant = "outline",
-  className = "",
+  initialPreview,
 }: FileUploaderProps) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  const [preview, setPreview] = useState<string | null>(initialPreview || null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0] || null;
+    
     if (file) {
-      setSelectedFile(file);
-      onFileSelect?.(file);
-      
-      // Create preview for images
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
-      
-      toast({
-        title: "File Uploaded",
-        description: `Successfully selected: ${file.name}`,
-      });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setFileName(file.name);
+      onFileSelect(file);
+    } else {
+      setPreview(null);
+      setFileName(null);
+      onFileSelect(null);
     }
   };
 
-  const handleClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleRemove = () => {
-    setSelectedFile(null);
+  const clearSelection = () => {
     setPreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    setFileName(null);
+    onFileSelect(null);
   };
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      <input
-        type="file"
-        ref={fileInputRef}
-        className="hidden"
-        accept={accept}
-        onChange={handleFileChange}
-      />
+    <div className="space-y-2">
+      <Label htmlFor="file-upload">{label}</Label>
       
-      {!preview ? (
-        <Button type="button" variant={buttonVariant} onClick={handleClick}>
-          <Upload className="mr-2 h-4 w-4" />
-          {label}
-        </Button>
-      ) : (
-        <div className="relative">
-          <img 
-            src={preview} 
-            alt="Preview" 
-            className="max-h-40 rounded-md object-contain border"
+      {!preview && (
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-teal-500 transition-colors">
+          <Input
+            id="file-upload"
+            type="file"
+            accept={accept}
+            onChange={handleFileChange}
+            className="hidden"
           />
-          <Button 
-            size="sm" 
-            variant="destructive" 
-            onClick={handleRemove}
-            className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm" 
-            onClick={handleClick}
-            className="mt-2"
-          >
-            Change File
-          </Button>
+          <label htmlFor="file-upload" className="cursor-pointer">
+            <div className="flex flex-col items-center">
+              <Upload className="h-6 w-6 text-gray-400 mb-2" />
+              <span className="text-sm font-medium text-gray-900">Click to upload</span>
+              <span className="text-xs text-gray-500 mt-1">or drag and drop</span>
+              <span className="text-xs text-gray-500 mt-2">{accept.replace("*", "")}</span>
+            </div>
+          </label>
         </div>
       )}
       
-      {selectedFile && !preview && (
-        <div className="flex items-center justify-between border rounded-md p-2">
-          <span className="text-sm truncate max-w-xs">{selectedFile.name}</span>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            onClick={handleRemove}
-            className="text-red-500 hover:text-red-700"
+      {preview && (
+        <div className="relative border rounded-lg overflow-hidden">
+          <img src={preview} alt="Preview" className="w-full h-auto max-h-64 object-cover" />
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            className="absolute top-2 right-2 rounded-full w-8 h-8 p-0"
+            onClick={clearSelection}
           >
             <X className="h-4 w-4" />
           </Button>
+          {fileName && (
+            <div className="bg-gray-100 p-2 text-xs font-medium truncate">
+              {fileName}
+            </div>
+          )}
         </div>
       )}
     </div>
