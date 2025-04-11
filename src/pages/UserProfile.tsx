@@ -16,6 +16,15 @@ import {
 } from "../components/ui/card";
 import { useToast } from "../components/ui/use-toast";
 import PhotoUpload from "../components/PhotoUpload";
+import ChangePasswordForm from "../components/ChangePasswordForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
 
 // Mock user data (in a real app, this would come from your auth context/api)
 const mockUser = {
@@ -34,6 +43,7 @@ const UserProfile = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   
   const [userData, setUserData] = useState({
     fullName: mockUser.fullName,
@@ -218,9 +228,22 @@ const UserProfile = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline">
-              Change Password
-            </Button>
+            <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  Change Password
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                  <DialogDescription>
+                    Enter your current password and a new password
+                  </DialogDescription>
+                </DialogHeader>
+                <ChangePasswordForm onClose={() => setIsPasswordDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
       </div>

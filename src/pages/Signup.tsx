@@ -15,6 +15,7 @@ import { Label } from "../components/ui/label";
 import { useToast } from "../components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Textarea } from "../components/ui/textarea";
+import PhotoUpload from "../components/PhotoUpload";
 
 // Type for the registration form data
 interface SignupFormData {
@@ -86,6 +87,10 @@ export default function Signup() {
 
   const handleRoleChange = (value: string) => {
     setFormData(prev => ({ ...prev, role: parseInt(value) }));
+  };
+
+  const handlePhotoChange = (photoUrl: string) => {
+    setFormData(prev => ({ ...prev, photoUrl }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -281,16 +286,11 @@ export default function Signup() {
                 {errors.dateOfBirth && <p className="text-sm text-red-500">{errors.dateOfBirth}</p>}
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="photoUrl">Profile Photo URL (Optional)</Label>
-                <Input 
-                  id="photoUrl" 
-                  name="photoUrl"
-                  placeholder="https://example.com/photo.jpg" 
-                  value={formData.photoUrl}
-                  onChange={handleChange}
-                />
-              </div>
+              <PhotoUpload
+                initialPhoto={formData.photoUrl}
+                onPhotoChange={handlePhotoChange}
+                label="Profile Photo"
+              />
             </CardContent>
             
             <CardFooter>

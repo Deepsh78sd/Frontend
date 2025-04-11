@@ -22,6 +22,7 @@ import {
 } from "../../../components/ui/card";
 import { Label } from "../../../components/ui/label";
 import { useToast } from "../../../components/ui/use-toast";
+import PhotoUpload from "../../../components/PhotoUpload";
 
 const petTypes = ["Dog", "Cat", "Bird", "Other"];
 
@@ -46,6 +47,10 @@ const AddPetAdoption = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     setPetData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhotoChange = (photoUrl: string) => {
+    setPetData((prev) => ({ ...prev, imageUrl: photoUrl }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -137,13 +142,10 @@ const AddPetAdoption = () => {
                 </div>
                 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="imageUrl">Pet Image URL</Label>
-                  <Input
-                    id="imageUrl"
-                    name="imageUrl"
-                    placeholder="Enter image URL"
-                    value={petData.imageUrl}
-                    onChange={handleChange}
+                  <PhotoUpload 
+                    initialPhoto={petData.imageUrl}
+                    onPhotoChange={handlePhotoChange}
+                    label="Pet Photo"
                   />
                 </div>
                 

@@ -58,6 +58,10 @@ const PhotoUpload = ({ initialPhoto = "", onPhotoChange, label = "Profile Photo"
     onPhotoChange("");
   };
 
+  const triggerFileInput = () => {
+    document.getElementById("photo-upload")?.click();
+  };
+
   return (
     <div className="space-y-2">
       <Label htmlFor="photo-upload">{label}</Label>
@@ -80,7 +84,7 @@ const PhotoUpload = ({ initialPhoto = "", onPhotoChange, label = "Profile Photo"
           <Button 
             variant="outline" 
             className="mt-2" 
-            onClick={() => document.getElementById("photo-upload")?.click()}
+            onClick={triggerFileInput}
           >
             <Upload className="h-4 w-4 mr-2" />
             Change Photo
@@ -88,12 +92,13 @@ const PhotoUpload = ({ initialPhoto = "", onPhotoChange, label = "Profile Photo"
         </div>
       ) : (
         <Card
-          className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-md transition-colors ${
+          className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-md transition-colors cursor-pointer ${
             isDragging ? "border-primary bg-muted" : "border-muted"
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={triggerFileInput}
         >
           <Image className="h-10 w-10 text-muted-foreground mb-2" />
           <p className="text-sm text-muted-foreground mb-2">
@@ -101,7 +106,10 @@ const PhotoUpload = ({ initialPhoto = "", onPhotoChange, label = "Profile Photo"
           </p>
           <Button 
             variant="outline" 
-            onClick={() => document.getElementById("photo-upload")?.click()}
+            onClick={(e) => {
+              e.stopPropagation();
+              triggerFileInput();
+            }}
           >
             <Upload className="h-4 w-4 mr-2" />
             Choose Photo
